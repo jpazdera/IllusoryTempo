@@ -1,0 +1,454 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+ <LimeSurveyDocType>Survey</LimeSurveyDocType>
+ <DBVersion>359</DBVersion>
+ <languages>
+  <language>en</language>
+ </languages>
+ <answers>
+  <fields>
+   <fieldname>qid</fieldname>
+   <fieldname>code</fieldname>
+   <fieldname>answer</fieldname>
+   <fieldname>sortorder</fieldname>
+   <fieldname>assessment_value</fieldname>
+   <fieldname>language</fieldname>
+   <fieldname>scale_id</fieldname>
+  </fields>
+  <rows>
+   <row>
+    <qid><![CDATA[581582]]></qid>
+    <code><![CDATA[A1]]></code>
+    <answer><![CDATA[Yes, I agree to participate]]></answer>
+    <sortorder><![CDATA[1]]></sortorder>
+    <assessment_value><![CDATA[0]]></assessment_value>
+    <language><![CDATA[en]]></language>
+    <scale_id><![CDATA[0]]></scale_id>
+   </row>
+  </rows>
+ </answers>
+ <groups>
+  <fields>
+   <fieldname>gid</fieldname>
+   <fieldname>sid</fieldname>
+   <fieldname>group_name</fieldname>
+   <fieldname>group_order</fieldname>
+   <fieldname>description</fieldname>
+   <fieldname>language</fieldname>
+   <fieldname>randomization_group</fieldname>
+   <fieldname>grelevance</fieldname>
+  </fields>
+  <rows>
+   <row>
+    <gid><![CDATA[43741]]></gid>
+    <sid><![CDATA[312957]]></sid>
+    <group_name><![CDATA[Verification form]]></group_name>
+    <group_order><![CDATA[1]]></group_order>
+    <description><![CDATA[This holds your name and email address separately from your data. This is used to verify your participation while keeping your data anonymous.]]></description>
+    <language><![CDATA[en]]></language>
+    <randomization_group/>
+    <grelevance/>
+   </row>
+  </rows>
+ </groups>
+ <questions>
+  <fields>
+   <fieldname>qid</fieldname>
+   <fieldname>parent_qid</fieldname>
+   <fieldname>sid</fieldname>
+   <fieldname>gid</fieldname>
+   <fieldname>type</fieldname>
+   <fieldname>title</fieldname>
+   <fieldname>question</fieldname>
+   <fieldname>preg</fieldname>
+   <fieldname>help</fieldname>
+   <fieldname>other</fieldname>
+   <fieldname>mandatory</fieldname>
+   <fieldname>question_order</fieldname>
+   <fieldname>language</fieldname>
+   <fieldname>scale_id</fieldname>
+   <fieldname>same_default</fieldname>
+   <fieldname>relevance</fieldname>
+   <fieldname>modulename</fieldname>
+  </fields>
+  <rows>
+   <row>
+    <qid><![CDATA[581580]]></qid>
+    <parent_qid><![CDATA[0]]></parent_qid>
+    <sid><![CDATA[312957]]></sid>
+    <gid><![CDATA[43741]]></gid>
+    <type><![CDATA[S]]></type>
+    <title><![CDATA[e1]]></title>
+    <question><![CDATA[Email address]]></question>
+    <preg/>
+    <help/>
+    <other><![CDATA[N]]></other>
+    <mandatory><![CDATA[Y]]></mandatory>
+    <question_order><![CDATA[2]]></question_order>
+    <language><![CDATA[en]]></language>
+    <scale_id><![CDATA[0]]></scale_id>
+    <same_default><![CDATA[0]]></same_default>
+    <relevance><![CDATA[1]]></relevance>
+   </row>
+   <row>
+    <qid><![CDATA[581581]]></qid>
+    <parent_qid><![CDATA[0]]></parent_qid>
+    <sid><![CDATA[312957]]></sid>
+    <gid><![CDATA[43741]]></gid>
+    <type><![CDATA[S]]></type>
+    <title><![CDATA[e2]]></title>
+    <question><![CDATA[Name]]></question>
+    <preg/>
+    <help/>
+    <other><![CDATA[N]]></other>
+    <mandatory><![CDATA[Y]]></mandatory>
+    <question_order><![CDATA[1]]></question_order>
+    <language><![CDATA[en]]></language>
+    <scale_id><![CDATA[0]]></scale_id>
+    <same_default><![CDATA[0]]></same_default>
+    <relevance><![CDATA[1]]></relevance>
+   </row>
+   <row>
+    <qid><![CDATA[581582]]></qid>
+    <parent_qid><![CDATA[0]]></parent_qid>
+    <sid><![CDATA[312957]]></sid>
+    <gid><![CDATA[43741]]></gid>
+    <type><![CDATA[L]]></type>
+    <title><![CDATA[G00Q02]]></title>
+    <question><![CDATA[<span style="font-size:26px;">Consent to Participate</span>
+<div> </div>
+
+<div>Having read the above, I understand that by clicking the “Yes” button below, I agree to take part in this study under the terms and conditions outlined in the accompanying letter of information.</div>
+]]></question>
+    <preg/>
+    <help/>
+    <other><![CDATA[N]]></other>
+    <mandatory><![CDATA[Y]]></mandatory>
+    <question_order><![CDATA[3]]></question_order>
+    <language><![CDATA[en]]></language>
+    <scale_id><![CDATA[0]]></scale_id>
+    <same_default><![CDATA[0]]></same_default>
+    <relevance><![CDATA[1]]></relevance>
+    <modulename/>
+   </row>
+   <row>
+    <qid><![CDATA[581583]]></qid>
+    <parent_qid><![CDATA[0]]></parent_qid>
+    <sid><![CDATA[312957]]></sid>
+    <gid><![CDATA[43741]]></gid>
+    <type><![CDATA[X]]></type>
+    <title><![CDATA[G00Q01]]></title>
+    <question><![CDATA[<p><span style="font-size:26px;">Preamble Statement</span></p>
+
+<table align="left" border="0" cellpadding="10" cellspacing="10"><tbody><tr bgcolor="#ffffff"><td><img alt="" src="/limesurvey/upload/surveys/312957/images/Letter%20of%20Informed%20Consent.gif" /><img alt="" src="/limesurvey/upload/surveys/312957/images/Letter%20of%20Informed%20Consent(1).jpg" style="width:1080px;float:left;" /></td>
+		</tr><tr><td>
+			<p> </p>
+
+			<h4><span style="font-size:18px;">This survey and the subsequent task should take approximately 30 minutes to complete. Please note that the experiment will require that you wear headphones and be seated in a quiet environment. If you are unable to fulfill these requirements at this time, please return later. Additionally, the experiment <u>cannot</u> be completed in <u>Safari</u> or <u>Internet Explorer</u>. Please return in another browser if you are currently using either of these.  Persons completing this task must be recruited through the SONA participant pool. You are free to complete this study or not. If you choose not to participate simply close this page.</span></h4>
+
+			<p>This survey is part of a study that has been reviewed and cleared by the <a href="http://reo.mcmaster.ca" target="_blank" rel="noreferrer noopener">McMaster Research Ethics Board</a> (MREB). The MREB protocol number associated with this survey is MREB 2164. If you have any concerns or questions about your rights as a participant or about the way the study is being conducted, please contact:</p>
+
+			<div>  McMaster Research Ethics Secretariat</div>
+
+			<div>  Telephone 1-(905) 525-9140 ext. 23142</div>
+
+			<div>  c/o Research Office for Administration, Development and Support (ROADS)</div>
+
+			<div>  E-mail: <a href="mailto:ethicsoffice@mcmaster.ca?subject=General%20questions%2C%20McMaster%20online%20survey">ethicsoffice@mcmaster.ca</a></div>
+			</td>
+		</tr></tbody></table>]]></question>
+    <preg/>
+    <help/>
+    <other><![CDATA[N]]></other>
+    <mandatory><![CDATA[N]]></mandatory>
+    <question_order><![CDATA[0]]></question_order>
+    <language><![CDATA[en]]></language>
+    <scale_id><![CDATA[0]]></scale_id>
+    <same_default><![CDATA[0]]></same_default>
+    <relevance><![CDATA[1]]></relevance>
+    <modulename/>
+   </row>
+   <row>
+    <qid><![CDATA[581584]]></qid>
+    <parent_qid><![CDATA[0]]></parent_qid>
+    <sid><![CDATA[312957]]></sid>
+    <gid><![CDATA[43741]]></gid>
+    <type><![CDATA[S]]></type>
+    <title><![CDATA[subjectID]]></title>
+    <question/>
+    <preg/>
+    <help/>
+    <other><![CDATA[N]]></other>
+    <mandatory><![CDATA[N]]></mandatory>
+    <question_order><![CDATA[4]]></question_order>
+    <language><![CDATA[en]]></language>
+    <scale_id><![CDATA[0]]></scale_id>
+    <same_default><![CDATA[0]]></same_default>
+    <relevance><![CDATA[1]]></relevance>
+   </row>
+  </rows>
+ </questions>
+ <question_attributes>
+  <fields>
+   <fieldname>qid</fieldname>
+   <fieldname>attribute</fieldname>
+   <fieldname>value</fieldname>
+   <fieldname>language</fieldname>
+  </fields>
+  <rows>
+   <row>
+    <qid><![CDATA[581584]]></qid>
+    <attribute><![CDATA[hidden]]></attribute>
+    <value><![CDATA[1]]></value>
+   </row>
+  </rows>
+ </question_attributes>
+ <surveys>
+  <fields>
+   <fieldname>sid</fieldname>
+   <fieldname>admin</fieldname>
+   <fieldname>expires</fieldname>
+   <fieldname>startdate</fieldname>
+   <fieldname>adminemail</fieldname>
+   <fieldname>anonymized</fieldname>
+   <fieldname>faxto</fieldname>
+   <fieldname>format</fieldname>
+   <fieldname>savetimings</fieldname>
+   <fieldname>template</fieldname>
+   <fieldname>language</fieldname>
+   <fieldname>additional_languages</fieldname>
+   <fieldname>datestamp</fieldname>
+   <fieldname>usecookie</fieldname>
+   <fieldname>allowregister</fieldname>
+   <fieldname>allowsave</fieldname>
+   <fieldname>autonumber_start</fieldname>
+   <fieldname>autoredirect</fieldname>
+   <fieldname>allowprev</fieldname>
+   <fieldname>printanswers</fieldname>
+   <fieldname>ipaddr</fieldname>
+   <fieldname>refurl</fieldname>
+   <fieldname>publicstatistics</fieldname>
+   <fieldname>publicgraphs</fieldname>
+   <fieldname>listpublic</fieldname>
+   <fieldname>htmlemail</fieldname>
+   <fieldname>sendconfirmation</fieldname>
+   <fieldname>tokenanswerspersistence</fieldname>
+   <fieldname>assessments</fieldname>
+   <fieldname>usecaptcha</fieldname>
+   <fieldname>usetokens</fieldname>
+   <fieldname>bounce_email</fieldname>
+   <fieldname>attributedescriptions</fieldname>
+   <fieldname>emailresponseto</fieldname>
+   <fieldname>emailnotificationto</fieldname>
+   <fieldname>tokenlength</fieldname>
+   <fieldname>showxquestions</fieldname>
+   <fieldname>showgroupinfo</fieldname>
+   <fieldname>shownoanswer</fieldname>
+   <fieldname>showqnumcode</fieldname>
+   <fieldname>bouncetime</fieldname>
+   <fieldname>bounceprocessing</fieldname>
+   <fieldname>bounceaccounttype</fieldname>
+   <fieldname>bounceaccounthost</fieldname>
+   <fieldname>bounceaccountpass</fieldname>
+   <fieldname>bounceaccountencryption</fieldname>
+   <fieldname>bounceaccountuser</fieldname>
+   <fieldname>showwelcome</fieldname>
+   <fieldname>showprogress</fieldname>
+   <fieldname>navigationdelay</fieldname>
+   <fieldname>nokeyboard</fieldname>
+   <fieldname>alloweditaftercompletion</fieldname>
+   <fieldname>googleanalyticsstyle</fieldname>
+   <fieldname>googleanalyticsapikey</fieldname>
+   <fieldname>questionindex</fieldname>
+   <fieldname>gsid</fieldname>
+   <fieldname>showsurveypolicynotice</fieldname>
+  </fields>
+  <rows>
+   <row>
+    <sid><![CDATA[312957]]></sid>
+    <admin><![CDATA[Jesse Pazdera]]></admin>
+    <expires><![CDATA[2020-08-18 17:38:31]]></expires>
+    <adminemail><![CDATA[pazderaj@mcmaster.ca]]></adminemail>
+    <anonymized><![CDATA[Y]]></anonymized>
+    <faxto/>
+    <format><![CDATA[G]]></format>
+    <savetimings><![CDATA[Y]]></savetimings>
+    <template><![CDATA[McMaster]]></template>
+    <language><![CDATA[en]]></language>
+    <additional_languages/>
+    <datestamp><![CDATA[Y]]></datestamp>
+    <usecookie><![CDATA[N]]></usecookie>
+    <allowregister><![CDATA[N]]></allowregister>
+    <allowsave><![CDATA[N]]></allowsave>
+    <autonumber_start><![CDATA[0]]></autonumber_start>
+    <autoredirect><![CDATA[Y]]></autoredirect>
+    <allowprev><![CDATA[N]]></allowprev>
+    <printanswers><![CDATA[N]]></printanswers>
+    <ipaddr><![CDATA[N]]></ipaddr>
+    <refurl><![CDATA[Y]]></refurl>
+    <publicstatistics><![CDATA[N]]></publicstatistics>
+    <publicgraphs><![CDATA[N]]></publicgraphs>
+    <listpublic><![CDATA[Y]]></listpublic>
+    <htmlemail><![CDATA[Y]]></htmlemail>
+    <sendconfirmation><![CDATA[Y]]></sendconfirmation>
+    <tokenanswerspersistence><![CDATA[N]]></tokenanswerspersistence>
+    <assessments><![CDATA[N]]></assessments>
+    <usecaptcha><![CDATA[N]]></usecaptcha>
+    <usetokens><![CDATA[N]]></usetokens>
+    <bounce_email><![CDATA[pazderaj@mcmaster.ca]]></bounce_email>
+    <emailresponseto><![CDATA[pazderaj@mcmaster.ca]]></emailresponseto>
+    <emailnotificationto/>
+    <tokenlength><![CDATA[15]]></tokenlength>
+    <showxquestions><![CDATA[N]]></showxquestions>
+    <showgroupinfo><![CDATA[X]]></showgroupinfo>
+    <shownoanswer><![CDATA[N]]></shownoanswer>
+    <showqnumcode><![CDATA[X]]></showqnumcode>
+    <bounceprocessing><![CDATA[N]]></bounceprocessing>
+    <showwelcome><![CDATA[N]]></showwelcome>
+    <showprogress><![CDATA[N]]></showprogress>
+    <navigationdelay><![CDATA[0]]></navigationdelay>
+    <nokeyboard><![CDATA[N]]></nokeyboard>
+    <alloweditaftercompletion><![CDATA[Y]]></alloweditaftercompletion>
+    <googleanalyticsstyle><![CDATA[0]]></googleanalyticsstyle>
+    <googleanalyticsapikey/>
+    <questionindex><![CDATA[0]]></questionindex>
+    <gsid><![CDATA[1]]></gsid>
+    <showsurveypolicynotice><![CDATA[0]]></showsurveypolicynotice>
+   </row>
+  </rows>
+ </surveys>
+ <surveys_languagesettings>
+  <fields>
+   <fieldname>surveyls_survey_id</fieldname>
+   <fieldname>surveyls_language</fieldname>
+   <fieldname>surveyls_title</fieldname>
+   <fieldname>surveyls_description</fieldname>
+   <fieldname>surveyls_welcometext</fieldname>
+   <fieldname>surveyls_endtext</fieldname>
+   <fieldname>surveyls_url</fieldname>
+   <fieldname>surveyls_urldescription</fieldname>
+   <fieldname>surveyls_email_invite_subj</fieldname>
+   <fieldname>surveyls_email_invite</fieldname>
+   <fieldname>surveyls_email_remind_subj</fieldname>
+   <fieldname>surveyls_email_remind</fieldname>
+   <fieldname>surveyls_email_register_subj</fieldname>
+   <fieldname>surveyls_email_register</fieldname>
+   <fieldname>surveyls_email_confirm_subj</fieldname>
+   <fieldname>surveyls_email_confirm</fieldname>
+   <fieldname>surveyls_dateformat</fieldname>
+   <fieldname>surveyls_attributecaptions</fieldname>
+   <fieldname>email_admin_notification_subj</fieldname>
+   <fieldname>email_admin_notification</fieldname>
+   <fieldname>email_admin_responses_subj</fieldname>
+   <fieldname>email_admin_responses</fieldname>
+   <fieldname>surveyls_numberformat</fieldname>
+   <fieldname>attachments</fieldname>
+   <fieldname>surveyls_policy_notice</fieldname>
+   <fieldname>surveyls_policy_error</fieldname>
+   <fieldname>surveyls_policy_notice_label</fieldname>
+  </fields>
+  <rows>
+   <row>
+    <surveyls_survey_id><![CDATA[312957]]></surveyls_survey_id>
+    <surveyls_language><![CDATA[en]]></surveyls_language>
+    <surveyls_title><![CDATA[Informed Consent (Study 159, Spring 2020)]]></surveyls_title>
+    <surveyls_description><![CDATA[This form holds your name and email address separately from your data. This is used to verify your participation while keeping your data anonymous.]]></surveyls_description>
+    <surveyls_welcometext/>
+    <surveyls_endtext/>
+    <surveyls_url><![CDATA[https://surveys.mcmaster.ca/limesurvey/index.php/798247?newtest=Y]]></surveyls_url>
+    <surveyls_urldescription/>
+    <surveyls_email_invite_subj><![CDATA[Invitation to participate in a survey]]></surveyls_email_invite_subj>
+    <surveyls_email_invite><![CDATA[Dear {FIRSTNAME},<br /><br />
+you have been invited to participate in a survey.<br /><br />
+The survey is titled:<br />
+"{SURVEYNAME}"<br /><br />
+"{SURVEYDESCRIPTION}"<br /><br />
+To participate, please click on the link below.<br /><br />
+Sincerely,<br /><br />
+{ADMINNAME} ({ADMINEMAIL})<br /><br />
+----------------------------------------------<br />
+Click here to do the survey:<br />
+{SURVEYURL}<br /><br />
+If you do not want to participate in this survey and don't want to receive any more invitations please click the following link:<br />
+{OPTOUTURL}<br /><br />
+If you are blacklisted but want to participate in this survey and want to receive invitations please click the following link:<br />
+{OPTINURL}]]></surveyls_email_invite>
+    <surveyls_email_remind_subj><![CDATA[Reminder to participate in a survey]]></surveyls_email_remind_subj>
+    <surveyls_email_remind><![CDATA[Dear {FIRSTNAME},<br /><br />
+Recently we invited you to participate in a survey.<br /><br />
+We note that you have not yet completed the survey, and wish to remind you that the survey is still available should you wish to take part.<br /><br />
+The survey is titled:<br />
+"{SURVEYNAME}"<br /><br />
+"{SURVEYDESCRIPTION}"<br /><br />
+To participate, please click on the link below.<br /><br />
+Sincerely,<br /><br />
+{ADMINNAME} ({ADMINEMAIL})<br /><br />
+----------------------------------------------<br />
+Click here to do the survey:<br />
+{SURVEYURL}<br /><br />
+If you do not want to participate in this survey and don't want to receive any more invitations please click the following link:<br />
+{OPTOUTURL}]]></surveyls_email_remind>
+    <surveyls_email_register_subj><![CDATA[Survey registration confirmation]]></surveyls_email_register_subj>
+    <surveyls_email_register><![CDATA[Dear {FIRSTNAME},<br /><br />
+You, or someone using your email address, have registered to participate in an online survey titled {SURVEYNAME}.<br /><br />
+To complete this survey, click on the following URL:<br /><br />
+{SURVEYURL}<br /><br />
+If you have any questions about this survey, or if you did not register to participate and believe this email is in error, please contact {ADMINNAME} at {ADMINEMAIL}.]]></surveyls_email_register>
+    <surveyls_email_confirm_subj><![CDATA[Confirmation of your participation in our survey]]></surveyls_email_confirm_subj>
+    <surveyls_email_confirm><![CDATA[Dear {FIRSTNAME},<br /><br />
+this email is to confirm that you have completed the survey titled {SURVEYNAME} and your response has been saved. Thank you for participating.<br /><br />
+If you have any further questions about this email, please contact {ADMINNAME} on {ADMINEMAIL}.<br /><br />
+Sincerely,<br /><br />
+{ADMINNAME}]]></surveyls_email_confirm>
+    <surveyls_dateformat><![CDATA[1]]></surveyls_dateformat>
+    <email_admin_notification_subj><![CDATA[Response submission for survey {SURVEYNAME}]]></email_admin_notification_subj>
+    <email_admin_notification><![CDATA[Hello,<br /><br />
+A new response was submitted for your survey '{SURVEYNAME}'.<br /><br />
+Click the following link to see the individual response:<br />
+{VIEWRESPONSEURL}<br /><br />
+Click the following link to edit the individual response:<br />
+{EDITRESPONSEURL}<br /><br />
+View statistics by clicking here:<br />
+{STATISTICSURL}]]></email_admin_notification>
+    <email_admin_responses_subj><![CDATA[Response submission for survey {SURVEYNAME} with results]]></email_admin_responses_subj>
+    <email_admin_responses><![CDATA[Hello,<br /><br />
+A new response was submitted for your survey '{SURVEYNAME}'.<br /><br />
+Click the following link to see the individual response:<br />
+{VIEWRESPONSEURL}<br /><br />
+Click the following link to edit the individual response:<br />
+{EDITRESPONSEURL}<br /><br />
+View statistics by clicking here:<br />
+{STATISTICSURL}<br /><br /><br />
+The following answers were given by the participant:<br />
+{ANSWERTABLE}]]></email_admin_responses>
+    <surveyls_numberformat><![CDATA[0]]></surveyls_numberformat>
+    <surveyls_policy_notice/>
+    <surveyls_policy_error/>
+    <surveyls_policy_notice_label/>
+   </row>
+  </rows>
+ </surveys_languagesettings>
+ <themes>
+  <theme>
+   <sid>312957</sid>
+   <template_name>McMaster</template_name>
+   <config>
+    <options>inherit</options>
+   </config>
+  </theme>
+ </themes>
+ <themes_inherited>
+  <theme>
+   <sid>312957</sid>
+   <template_name>McMaster</template_name>
+   <config>
+    <options>
+     <ajaxmode>off</ajaxmode>
+     <brandlogo>on</brandlogo>
+     <brandlogofile>./files/logo.png</brandlogofile>
+     <container>on</container>
+    </options>
+   </config>
+  </theme>
+ </themes_inherited>
+</document>
