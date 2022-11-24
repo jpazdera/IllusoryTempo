@@ -37,7 +37,9 @@ true_intercept = true_model$coefficients[1]
 subj_avgs = group_by(data, subject) %>%
   summarize(slope = mean(slope), intercept = mean(intercept))
 t.test(subj_avgs$slope, mu=true_slope, var.equal=T, conf.level=.95)
+(mean(subj_avgs$slope) - true_slope) / sd(subj_avgs$slope)  # Cohen's d
 t.test(subj_avgs$intercept, mu=true_intercept, var.equal=T, conf.level=.95)
+(mean(subj_avgs$intercept) - true_intercept) / sd(subj_avgs$intercept)  # Cohen's d
 
 
 
