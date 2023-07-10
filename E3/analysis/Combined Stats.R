@@ -94,7 +94,6 @@ anova_test(data=subj_avgs, dv=residual, wid=subject, within=loudness, effect.siz
 #anova_stats(model)
 
 s <- c()
-a <- c()
 b1 <- c()
 b2 <- c()
 b3 <- c()
@@ -102,23 +101,18 @@ b4 <- c()
 b5 <- c()
 for (subj in unique(data$subject)) {
   mask <- (data$subject==subj)
-  model <- lm(residual ~ 1 + poly(pitch, 5), data=data[mask,])
+  model <- lm(residual ~ 0 + poly(pitch, 5), data=data[mask,])
   s <- append(s, subj)
-  a <- append(a, model$coefficients[1])
-  b1 <- append(b1, model$coefficients[2])
-  b2 <- append(b2, model$coefficients[3])
-  b3 <- append(b3, model$coefficients[4])
-  b4 <- append(b4, model$coefficients[5])
-  b5 <- append(b5, model$coefficients[6])
+  b1 <- append(b1, model$coefficients[1])
+  b2 <- append(b2, model$coefficients[2])
+  b3 <- append(b3, model$coefficients[3])
+  b4 <- append(b4, model$coefficients[4])
+  b5 <- append(b5, model$coefficients[5])
 }
-fits <- data.frame(s, a, b1, b2, b3, b4, b5)
+fits <- data.frame(s, b1, b2, b3, b4, b5)
 fits$s <- as.factor(fits$s)
-# Intercept
-# Intercepts are essentially floating point errors around 0 due to already regressing
-# out subject intercepts during calculation of residual tempo scores
-boxplot(fits$a)
-t.test(fits$a, mu=0, conf.level=.95, alternative="two.sided")
-mean(fits$a) / sd(fits$a)
+# Intercepts are fixed at 0 due to already regressing out subject intercepts
+# during calculation of residual tempo ratings
 # Linear Slope
 boxplot(fits$b1)
 t.test(fits$b1, mu=0, conf.level=.95, alternative="two.sided")
