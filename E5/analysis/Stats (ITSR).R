@@ -1,5 +1,4 @@
 library(rstatix)  # For anova_test
-library(sjstats)  # For anova_stats
 library(tidyverse)
 options(contrasts=c("contr.sum","contr.poly"))
 setwd("~/git/IllusoryTempo/E5/analysis")
@@ -28,8 +27,8 @@ str(full_data)
 data <- filter(full_data, !(cooks > 4/180))
 n_dropped <- count(full_data) - count(data)
 perc_dropped <- n_dropped / count(full_data) * 100
-print(n_dropped)
-print(perc_dropped)
+print(n_dropped)  # 664 dropped
+print(perc_dropped)  # 4.85% dropped
 
 ###
 # RAW TEMPO RATINGS
@@ -45,8 +44,12 @@ true_intercept <- true_model$coefficients[1]
 # Test subject fits against ground truth
 subj_avgs <- group_by(data, subject) %>%
   summarize(slope = mean(slope), intercept = mean(intercept))
+# Slope (n.s.)
+# t(75)=0.71, p=.479, d=0.082
 t.test(subj_avgs$slope, mu=true_slope, conf.level=.95, alternative='two.sided')
 (mean(subj_avgs$slope) - true_slope) / sd(subj_avgs$slope)
+# Intercept (n.s.)
+# t(75)=-0.57, p=.571, d=-0.065
 t.test(subj_avgs$intercept, mu=true_intercept, conf.level=.95, alternative='two.sided')
 (mean(subj_avgs$intercept) - true_intercept) / sd(subj_avgs$intercept)
 
@@ -57,12 +60,14 @@ t.test(subj_avgs$intercept, mu=true_intercept, conf.level=.95, alternative='two.
 # Get subject averages
 subj_avgs <- group_by(data, subject, loudness) %>%
   summarize(residual = mean(residual, na.rm=T))
+# Descriptive stats by condition -3:M=0.15, SD=0.12; +0:M=-0.03, SD=0.10; +3:M=-0.12, SD=0.11
 group_means <- aggregate(subj_avgs$residual, list(subj_avgs$loudness), mean)$x  # Means by condition
 group_sds <- aggregate(subj_avgs$residual, list(subj_avgs$loudness), sd)$x / sqrt(length(unique(subj_avgs$subject)))  # Standard deviations by condition
 group_sems <- group_sds / sqrt(length(unique(subj_avgs$subject)))  # Standard errors by condition
 subj_avgs <- ungroup(subj_avgs)
 
-# Repeated measures ANOVA
+# Repeated measures ANOVA (n.s.)
+# F(2, 150)=0.98, p=.377, pes=.013
 anova_test(data=subj_avgs, dv=residual, wid=subject, within=loudness, effect.size="pes", type=3)
 
 ###
@@ -92,33 +97,33 @@ fits$r <- as.factor(fits$r)
 # MAIN EFFECT OF PITCH
 # Intercepts are fixed at 0 due to already regressing out subject intercepts
 # during calculation of residual tempo ratings
-# Linear Slope
+# Linear Slope (***)
+# t(75)=6.05, p<.001, d=0.694, M=11.15, SD=16.06
 boxplot(fits$b1)
 t.test(fits$b1, mu=0, conf.level=.95, alternative="two.sided")
 mean(fits$b1) / sd(fits$b1)
-# Quadratic Slope
+# Quadratic Slope (n.s.)
+# t(75)=-0.950, p=.345, d=-0.109, M=-0.90, SD=8.22
 boxplot(fits$b2)
 t.test(fits$b2, mu=0, conf.level=.95, alternative="two.sided")
 mean(fits$b2) / sd(fits$b2)
 
 # PITCH x REGISTER INTERACTION
-# Linear Slope
+# Linear Slope (*)
+# t(74)=2.07, p=.042, d=0.465, M=14.98|7.51, SD=16.81|14.62
 boxplot(b1 ~ r, data=fits)
 t.test(fits$b1[fits$r==0], fits$b1[fits$r==1], paired=F, var.equal=T, conf.level=.95, alternative="two.sided")
 (mean(fits$b1[fits$r==0]) - mean(fits$b1[fits$r==1])) / sd(fits$b1)
-# Quadratic Slope
+# Quadratic Slope (n.s.)
+# t(74)=-1.71, p=.091, d=-0.389, M=-2.53|0.66, SD=9.16|6.98
 boxplot(b2 ~ r, data=fits)
 t.test(fits$b2[fits$r==0], fits$b2[fits$r==1], paired=F, var.equal=T, conf.level=.95, alternative="two.sided")
 (mean(fits$b2[fits$r==0]) - mean(fits$b2[fits$r==1])) / sd(fits$b2)
 
-# If interaction, check whether slopes are nonzero in both conditions
-# Linear Slope
+# Linear slope significantly differs by condition, so check whether slopes are nonzero in each condition
+# Lower Register (***): t(36)=5.42, p<.001, d=0.891, M=14.98, SD=16.81
+# Upper Register (**): t(38)=3.21, p=.003, d=0.514, M=7.51, SD=14.62
 t.test(fits$b1[fits$r==0], mu=0, conf.level=.95, alternative="two.sided")
 mean(fits$b1[fits$r==0]) / sd(fits$b1[fits$r==0])
 t.test(fits$b1[fits$r==1], mu=0, conf.level=.95, alternative="two.sided")
 mean(fits$b1[fits$r==1]) / sd(fits$b1[fits$r==1])
-# Quadratic Slope
-t.test(fits$b2[fits$r==0], mu=0, conf.level=.95, alternative="two.sided")
-mean(fits$b2[fits$r==0]) / sd(fits$b2[fits$r==0])
-t.test(fits$b2[fits$r==1], mu=0, conf.level=.95, alternative="two.sided")
-mean(fits$b2[fits$r==1]) / sd(fits$b2[fits$r==1])

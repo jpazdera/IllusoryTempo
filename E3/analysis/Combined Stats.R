@@ -1,5 +1,4 @@
 library(rstatix)  # For anova_test
-library(sjstats)  # For anova_stats
 library(tidyverse)
 options(contrasts=c("contr.sum","contr.poly"))
 setwd("~/git/IllusoryTempo/E3/analysis/")
@@ -45,7 +44,7 @@ data <- filter(full_data, !(cooks > 4/90))
 n_dropped <- count(full_data) - count(data)
 perc_dropped <- n_dropped / count(full_data) * 100
 print(n_dropped)  # 932 dropped
-print(perc_dropped)  # 5.4% dropped
+print(perc_dropped)  # 5.37% dropped
 
 ###
 # RAW TEMPO RATINGS
@@ -61,10 +60,14 @@ true_intercept <- true_model$coefficients[1]
 # Test subject fits against ground truth
 subj_avgs <- group_by(data, subject) %>%
   summarize(slope = mean(slope), intercept = mean(intercept))
+# Slope (n.s.)
+# t(192)=0.40, p=.693, d=0.029
 t.test(subj_avgs$slope, mu=true_slope, conf.level=.95, alternative='two.sided')
-(mean(subj_avgs$slope) - true_slope) / sd(subj_avgs$slope)  # Cohen's d
+(mean(subj_avgs$slope) - true_slope) / sd(subj_avgs$slope)
+# Intercept (n.s.)
+# t(192)=-0.31, p=.756, d=-0.022
 t.test(subj_avgs$intercept, mu=true_intercept, conf.level=.95, alternative='two.sided')
-(mean(subj_avgs$intercept) - true_intercept) / sd(subj_avgs$intercept)  # Cohen's d
+(mean(subj_avgs$intercept) - true_intercept) / sd(subj_avgs$intercept)
 
 ###
 # LOUDNESS CONTROL
@@ -73,12 +76,14 @@ t.test(subj_avgs$intercept, mu=true_intercept, conf.level=.95, alternative='two.
 # Get subject averages
 subj_avgs <- group_by(data, subject, loudness) %>%
   summarize(residual = mean(residual, na.rm=T))
-group_means <- aggregate(subj_avgs$residual, list(subj_avgs$loudness), mean)$x  # Means by condition
-group_sds <- aggregate(subj_avgs$residual, list(subj_avgs$loudness), sd)$x / sqrt(length(unique(subj_avgs$subject)))  # Standard deviations by condition
-group_sems <- group_sds / sqrt(length(unique(subj_avgs$subject)))  # Standard errors by condition
+# Descriptive stats by condition -3:M=0.21, SD=0.13; +0:M=-0.09, SD=0.11; +3:M=-0.11, SD=0.13
+group_means <- aggregate(subj_avgs$residual, list(subj_avgs$loudness), mean)$x
+group_sds <- aggregate(subj_avgs$residual, list(subj_avgs$loudness), sd)$x / sqrt(length(unique(subj_avgs$subject)))
+group_sems <- group_sds / sqrt(length(unique(subj_avgs$subject)))
 subj_avgs <- ungroup(subj_avgs)
 
-# Repeated measures ANOVA
+# Repeated measures ANOVA (n.s.)
+# GG-corrected rmANOVA: F(1.94, 371.9)=1.47, p=.232, pes=.008
 anova_test(data=subj_avgs, dv=residual, wid=subject, within=loudness, effect.size="pes", type=3)
 
 ###
@@ -113,23 +118,28 @@ fits <- data.frame(s, b1, b2, b3, b4, b5)
 fits$s <- as.factor(fits$s)
 # Intercepts are fixed at 0 due to already regressing out subject intercepts
 # during calculation of residual tempo ratings
-# Linear Slope
+# Linear Slope (**)
+# t(192)=3.17, p=.002, d=0.228, M=2.39, SD=10.49
 boxplot(fits$b1)
 t.test(fits$b1, mu=0, conf.level=.95, alternative="two.sided")
 mean(fits$b1) / sd(fits$b1)
-# Quadratic Slope
+# Quadratic Slope (***)
+# t(192)=-6.87, p<.001, d=-0.494, M=-5.36, SD=10.84
 boxplot(fits$b2)
 t.test(fits$b2, mu=0, conf.level=.95, alternative="two.sided")
 mean(fits$b2) / sd(fits$b2)
-# Cubic Slope
+# Cubic Slope (n.s.)
+# t(192)=1.10, p=.275, d=0.079, M=0.82, SD=10.36
 boxplot(fits$b3)
 t.test(fits$b3, mu=0, conf.level=.95, alternative="two.sided")
 mean(fits$b3) / sd(fits$b3)
-# Quartic Slope
+# Quartic Slope (n.s.)
+# t(192)=0.49, p=.622, d=0.036, M=0.37, SD=10.40
 boxplot(fits$b4)
 t.test(fits$b4, mu=0, conf.level=.95, alternative="two.sided")
 mean(fits$b4) / sd(fits$b4)
-# Quintic Slope
+# Quintic Slope (n.s.)
+# t(192)=-1.62, p=.106, d=-0.117, M=-1.14, SD=9.71
 boxplot(fits$b5)
 t.test(fits$b5, mu=0, conf.level=.95, alternative="two.sided")
 mean(fits$b5) / sd(fits$b5)
@@ -157,12 +167,22 @@ for (subj in unique(data$subject)) {
 fits <- data.frame(s, t, a, b1, b2)
 fits$s <- as.factor(fits$s)
 fits$t <- as.factor(fits$t)
+# Intercept (Main Effect of Tempo Range) (***)
+# GG-corrected rmANOVA: F(2.78, 533.72)=6.76, p<.001, pes=.034
 boxplot(a ~ t, data=fits)
 anova_test(data=fits, dv=a, wid=s, within=t, effect.size="pes", type=3)
+# Linear Slope x Tempo Interaction (n.s.)
+# GG-corrected rmANOVA: F(3.79, 726.91)=2.02, p=.094, pes=.010
 boxplot(b1 ~ t, data=fits)
 anova_test(data=fits, dv=b1, wid=s, within=t, effect.size="pes", type=3)
+# Quadratic Slope x Tempo Interaction (n.s.)
+# GG-corrected rmANOVA: F(3.75, 719.54)=1.56, p=.186, pes=.008
 boxplot(b2 ~ t, data=fits)
 anova_test(data=fits, dv=b2, wid=s, within=t, effect.size="pes", type=3)
+
+# Pairwise comparisons for main effect of tempo
+# 3 is lower than all except 2; 5 is greater than both 2 and 3
+pairwise.t.test(fits$a, fits$t, paired=T, p.adjust.method='bonferroni', alternative='two.sided')
 
 ###
 # EFFECT OF TAPPING
@@ -189,19 +209,22 @@ for (subj in unique(data$subject)) {
 fits <- data.frame(s, tap, a, b1, b2)
 fits$s <- as.factor(fits$s)
 fits$tap <- as.factor(fits$tap)
-# Intercept
+# Intercept (Main effect of tapping) (n.s)
 # Intercept is fixed at zero within-subject due to regressing out intercept during
 # residual tempo rating calculation. NTI condition's average intercept is guaranteed
 # to be 0; TI-YT condition's intercept may not equal 0 if the participant didn't tap
 # on every trial.
+# t(87)=-0.17, p=.869, d=-0.012, M=-0.03, SD=1.02
 boxplot(a ~ tap, data=fits)
 t.test(fits$a[tap==2], mu=0, conf.level=.95, alternative="two.sided")
-mean(fits$a) / sd(fits$a)  # Cohen's d
-# Linear Slope
+mean(fits$a) / sd(fits$a)
+# Linear Slope x Tapping Interaction (n.s.)
+# t(182)=-0.24, p=.812, d=-0.035, M=1.80|2.14, SD=9.01|10.00
 boxplot(b1 ~ tap, data=fits)
 t.test(fits$b1[tap==0], fits$b1[tap==2], paired=F, var.equal=T, conf.level=.95, alternative="two.sided")
 (mean(fits$b1[tap==0]) - mean(fits$b1[tap==2])) / sd(fits$b1)
-# Quadratic Slope
+# Quadratic Slope x Tapping Interaction (.)
+# t(182)=-1.94, p=.054, d=-0.284, M=-6.80 | -3.63, SD=11.26|10.86
 boxplot(b2 ~ tap, data=fits)
 t.test(fits$b2[tap==0], fits$b2[tap==2], paired=F, var.equal=T, conf.level=.95, alternative="two.sided")
 (mean(fits$b2[tap==0]) - mean(fits$b2[tap==2])) / sd(fits$b2)
