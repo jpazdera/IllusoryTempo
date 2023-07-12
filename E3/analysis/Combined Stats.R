@@ -83,7 +83,8 @@ group_sems <- group_sds / sqrt(length(unique(subj_avgs$subject)))
 subj_avgs <- ungroup(subj_avgs)
 
 # Repeated measures ANOVA (n.s.)
-# GG-corrected rmANOVA: F(1.94, 371.9)=1.47, p=.232, pes=.008
+# Sphericity violated (p=.043; GG epsilon=.968)
+# GG-corrected rmANOVA: F(1.96, 375.63)=1.47, p=.232, pes=.008
 anova_test(data=subj_avgs, dv=residual, wid=subject, within=loudness, effect.size="pes", type=3)
 
 ###
@@ -168,14 +169,17 @@ fits <- data.frame(s, t, a, b1, b2)
 fits$s <- as.factor(fits$s)
 fits$t <- as.factor(fits$t)
 # Intercept (Main Effect of Tempo Range) (***)
+# Sphericity violated (p<.001, GG epsilon=0.695)
 # GG-corrected rmANOVA: F(2.78, 533.72)=6.76, p<.001, pes=.034
 boxplot(a ~ t, data=fits)
 anova_test(data=fits, dv=a, wid=s, within=t, effect.size="pes", type=3)
 # Linear Slope x Tempo Interaction (n.s.)
+# Sphericity violated (p =.019, GG epsilon=0.946)
 # GG-corrected rmANOVA: F(3.79, 726.91)=2.02, p=.094, pes=.010
 boxplot(b1 ~ t, data=fits)
 anova_test(data=fits, dv=b1, wid=s, within=t, effect.size="pes", type=3)
 # Quadratic Slope x Tempo Interaction (n.s.)
+# Sphericity violated (p=.003, GG epsilon=0.937)
 # GG-corrected rmANOVA: F(3.75, 719.54)=1.56, p=.186, pes=.008
 boxplot(b2 ~ t, data=fits)
 anova_test(data=fits, dv=b2, wid=s, within=t, effect.size="pes", type=3)
