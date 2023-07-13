@@ -49,7 +49,7 @@ subj_avgs <- group_by(data, subject) %>%
 t.test(subj_avgs$slope, mu=true_slope, conf.level=.95, alternative='two.sided')
 (mean(subj_avgs$slope) - true_slope) / sd(subj_avgs$slope)
 # Intercept (n.s.)
-# t(76)=-0.40, p=.694, d=-0.045
+# t(76)=-0.40, p=.694, d=0.045
 t.test(subj_avgs$intercept, mu=true_intercept, conf.level=.95, alternative='two.sided')
 (mean(subj_avgs$intercept) - true_intercept) / sd(subj_avgs$intercept)
 
