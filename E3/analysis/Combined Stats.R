@@ -125,7 +125,7 @@ boxplot(fits$b1)
 t.test(fits$b1, mu=0, conf.level=.95, alternative="two.sided")
 mean(fits$b1) / sd(fits$b1)
 # Quadratic Slope (***)
-# t(192)=-6.87, p<.001, d=-0.494, M=-5.36, SD=10.84
+# t(192)=-6.87, p<.001, d=0.494, M=-5.36, SD=10.84
 boxplot(fits$b2)
 t.test(fits$b2, mu=0, conf.level=.95, alternative="two.sided")
 mean(fits$b2) / sd(fits$b2)
@@ -140,7 +140,7 @@ boxplot(fits$b4)
 t.test(fits$b4, mu=0, conf.level=.95, alternative="two.sided")
 mean(fits$b4) / sd(fits$b4)
 # Quintic Slope (n.s.)
-# t(192)=-1.62, p=.106, d=-0.117, M=-1.14, SD=9.71
+# t(192)=-1.62, p=.106, d=0.117, M=-1.14, SD=9.71
 boxplot(fits$b5)
 t.test(fits$b5, mu=0, conf.level=.95, alternative="two.sided")
 mean(fits$b5) / sd(fits$b5)
@@ -198,15 +198,19 @@ a <- c()
 b1 <- c()
 b2 <- c()
 for (subj in unique(data$subject)) {
-  for (tap_cond in c(0, 2)) {
+  for (tap_cond in c(0, 1, 2)) {
     mask <- (data$subject==subj) & (data$tap_type == tap_cond)
+    s <- append(s, subj)
+    tap <- append(tap, tap_cond)
     if (sum(mask) > 2) {
       model <- lm(residual ~ 1 + poly(pitch, 2), data=data[mask,])
-      s <- append(s, subj)
-      tap <- append(tap, tap_cond)
       a <- append(a, model$coefficients[1])
       b1 <- append(b1, model$coefficients[2])
       b2 <- append(b2, model$coefficients[3])
+    } else {
+      a <- append(a, NaN)
+      b1 <- append(b1, NaN)
+      b2 <- append(b2, NaN)
     }
   }
 }
@@ -218,17 +222,27 @@ fits$tap <- as.factor(fits$tap)
 # residual tempo rating calculation. NTI condition's average intercept is guaranteed
 # to be 0; TI-YT condition's intercept may not equal 0 if the participant didn't tap
 # on every trial.
-# t(87)=-0.17, p=.869, d=-0.012, M=-0.03, SD=1.02
+# t(87)=-0.17, p=.869, d=0.018, M=-0.03, SD=1.48
 boxplot(a ~ tap, data=fits)
 t.test(fits$a[tap==2], mu=0, conf.level=.95, alternative="two.sided")
-mean(fits$a) / sd(fits$a)
+mean(fits$a[tap==2], na.rm=T) / sd(fits$a[tap==2], na.rm=T)
 # Linear Slope x Tapping Interaction (n.s.)
-# t(182)=-0.24, p=.812, d=-0.035, M=1.80|2.14, SD=9.01|10.00
+# t(182)=-0.24, p=.812, d=0.035, M=1.80|2.14, SD=9.01|10.00
 boxplot(b1 ~ tap, data=fits)
 t.test(fits$b1[tap==0], fits$b1[tap==2], paired=F, var.equal=T, conf.level=.95, alternative="two.sided")
-(mean(fits$b1[tap==0]) - mean(fits$b1[tap==2])) / sd(fits$b1)
+(mean(fits$b1[tap==0], na.rm=T) - mean(fits$b1[tap==2], na.rm=T)) / sd(fits$b1[tap != 1], na.rm=T)
 # Quadratic Slope x Tapping Interaction (.)
-# t(182)=-1.94, p=.054, d=-0.284, M=-6.80 | -3.63, SD=11.26|10.86
+# t(182)=-1.94, p=.054, d=0.284, M=-6.80 | -3.63, SD=11.26|10.86
 boxplot(b2 ~ tap, data=fits)
 t.test(fits$b2[tap==0], fits$b2[tap==2], paired=F, var.equal=T, conf.level=.95, alternative="two.sided")
-(mean(fits$b2[tap==0]) - mean(fits$b2[tap==2])) / sd(fits$b2)
+(mean(fits$b2[tap==0], na.rm=T) - mean(fits$b2[tap==2], na.rm=T)) / sd(fits$b2[tap != 1], na.rm=T)
+
+# Intercept Within-Subject (n.s.)
+# t(39)=0.42, p=.676, d=???, MD=0.36, SDD=???
+t.test(fits$a[tap==1], fits$a[tap==2], paired=T, var.equal=T, conf.level=.95, alternative="two.sided")
+# Linear Slope x Tapping Interaction W.S. (n.s.)
+# t(39)=0.54, p=.595, d=???, MD=1.10, SDD=???
+t.test(fits$b1[tap==1], fits$b1[tap==2], paired=T, var.equal=T, conf.level=.95, alternative="two.sided")
+# Quadratic Slope x Tapping Interaction W.S. (n.s.)
+# t(39)=-0.61, p=.545, d=???, MD=-1.77, SDD=???
+t.test(fits$b2[tap==1], fits$b2[tap==2], paired=T, var.equal=T, conf.level=.95, alternative="two.sided")
