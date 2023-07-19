@@ -76,17 +76,19 @@ anova_test(data=subj_avgs, dv=residual, wid=subject, within=loudness, effect.siz
 
 s <- c()
 r <- c()
+a <- c()
 b1 <- c()
 b2 <- c()
 for (subj in unique(data$subject)) {
   for (reg in c(0, 1)) {
     mask <- (data$subject==subj) & (data$range == reg)
     if (sum(mask) > 2) {
-      model <- lm(residual ~ 0 + poly(pitch, 2), data=data[mask,])
+      model <- lm(residual ~ 1 + poly(pitch, 2), data=data[mask,])
       s <- append(s, subj)
       r <- append(r, reg)
-      b1 <- append(b1, model$coefficients[1])
-      b2 <- append(b2, model$coefficients[2])
+      a <- append(a, model$coefficients[1])
+      b1 <- append(b1, model$coefficients[2])
+      b2 <- append(b2, model$coefficients[3])
     }
   }
 }
@@ -95,7 +97,7 @@ fits$s <- as.factor(fits$s)
 fits$r <- as.factor(fits$r)
 
 # MAIN EFFECT OF PITCH
-# Intercepts are fixed at 0 due to already regressing out subject intercepts
+# Intercepts are all approximately 0 due to already regressing out subject intercepts
 # during calculation of residual tempo ratings
 # Linear Slope (***)
 # t(75)=6.05, p<.001, d=0.694, M=11.15, SD=16.06

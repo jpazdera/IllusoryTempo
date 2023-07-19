@@ -75,18 +75,20 @@ anova_test(data=subj_avgs, dv=residual, wid=subject, within=loudness, effect.siz
 ###
 
 s <- c()
+a <- c()
 b1 <- c()
 b2 <- c()
 for (subj in unique(data$subject)) {
   mask <- (data$subject==subj)
-  model <- lm(residual ~ 0 + poly(pitch, 2), data=data[mask,])
+  model <- lm(residual ~ 1 + poly(pitch, 2), data=data[mask,])
   s <- append(s, subj)
-  b1 <- append(b1, model$coefficients[1])
-  b2 <- append(b2, model$coefficients[2])
+  a <- append(a, model$coefficients[1])
+  b1 <- append(b1, model$coefficients[2])
+  b2 <- append(b2, model$coefficients[3])
 }
 fits <- data.frame(s, b1, b2)
 fits$s <- as.factor(fits$s)
-# Intercepts are fixed at 0 due to already regressing out subject intercepts
+# Intercepts are all approximately 0 due to already regressing out subject intercepts
 # during calculation of residual tempo ratings
 # Linear Slope (.)
 # t(76)=1.87, p=.065, d=0.213, M=2.76, SD=12.93
