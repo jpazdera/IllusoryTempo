@@ -1,3 +1,5 @@
+library(ICSNP)  # For HotellingsT2
+library(MANOVA.RM)
 library(rstatix)  # For anova_test
 library(tidyverse)
 options(contrasts=c("contr.sum","contr.poly"))
@@ -83,7 +85,7 @@ group_sems <- group_sds / sqrt(length(unique(subj_avgs$subject)))
 subj_avgs <- ungroup(subj_avgs)
 
 # Repeated measures ANOVA (n.s.)
-# Sphericity violated (p=.043; GG epsilon=.968)
+# Sphericity violated (p=.043; HF epsilon=.968)
 # GG-corrected rmANOVA: F(1.96, 375.63)=1.47, p=.232, pes=.008
 anova_test(data=subj_avgs, dv=residual, wid=subject, within=loudness, effect.size="pes", type=3)
 
@@ -91,15 +93,8 @@ anova_test(data=subj_avgs, dv=residual, wid=subject, within=loudness, effect.siz
 # EFFECT OF PITCH
 ###
 
-# Fifth-order polynomial regression [ORIGINAL ANALYSIS]
-#data$pitch <- as.numeric(data$pitch)
-#data$tempo <- factor(data$tempo, ordered=F)
-#data$tap_type <- factor(data$tap_type, ordered=F)
-#model <- lm(residual ~ 1 + poly(pitch, 5) * (tap_type + tempo), data=data)
-#summary(model)
-#anova_stats(model)
-
 s <- c()
+a <- c()
 b1 <- c()
 b2 <- c()
 b3 <- c()
@@ -107,18 +102,27 @@ b4 <- c()
 b5 <- c()
 for (subj in unique(data$subject)) {
   mask <- (data$subject==subj)
-  model <- lm(residual ~ 0 + poly(pitch, 5), data=data[mask,])
+  model <- lm(residual ~ 1 + poly(pitch, 5), data=data[mask,])
   s <- append(s, subj)
-  b1 <- append(b1, model$coefficients[1])
-  b2 <- append(b2, model$coefficients[2])
-  b3 <- append(b3, model$coefficients[3])
-  b4 <- append(b4, model$coefficients[4])
-  b5 <- append(b5, model$coefficients[5])
+  a <- append(a, model$coefficients[1])
+  b1 <- append(b1, model$coefficients[2])
+  b2 <- append(b2, model$coefficients[3])
+  b3 <- append(b3, model$coefficients[4])
+  b4 <- append(b4, model$coefficients[5])
+  b5 <- append(b5, model$coefficients[6])
 }
-fits <- data.frame(s, b1, b2, b3, b4, b5)
+fits <- data.frame(s, a, b1, b2, b3, b4, b5)
 fits$s <- as.factor(fits$s)
-# Intercepts are fixed at 0 due to already regressing out subject intercepts
-# during calculation of residual tempo ratings
+
+# Intercepts are all approximately 0 due to already regressing out subject intercepts during calculation of
+# residual tempo ratings. Compare the five slopes to 0 with Hotelling's T-squared. These pages have great explanations:
+# https://real-statistics.com/multivariate-statistics/hotellings-t-square-statistic/one-sample-hotellings-t-square/
+# https://biotoolbox.binghamton.edu/Multivariate%20Methods/Multivariate%20Hypothesis%20Testing/pdf%20files/MHT%20010.pdf
+# F(5, 188) = 11.27, p < .001, pes = 0.231
+T2 <- HotellingsT2(fits[, c('b1', 'b2', 'b3', 'b4', 'b5')], mu=rep(0, 5), na.action=drop, test='f')
+T2$parameter[['df1']] * T2$statistic[[1]] / (T2$parameter[['df1']] * T2$statistic[[1]] + T2$parameter[['df2']])
+
+# Post-hoc one sample t-tests on slopes of each order
 # Linear Slope (**)
 # t(192)=3.17, p=.002, d=0.228, M=2.39, SD=10.49
 boxplot(fits$b1)
@@ -168,22 +172,18 @@ for (subj in unique(data$subject)) {
 fits <- data.frame(s, t, a, b1, b2)
 fits$s <- as.factor(fits$s)
 fits$t <- as.factor(fits$t)
+
+# MANOVA for Pitch x Tempo interaction (n.s.)
+# Pillai = .018, F(8, 1536) = 1.74, p = .084, pes = .009
+model <- manova(cbind(b1, b2) ~ t + Error(s / t), data=fits)
+summary(model)
+8 * 1.7424 / (8 * 1.7424 + 1536)  # Partial eta squared
+
 # Intercept (Main Effect of Tempo Range) (***)
 # Sphericity violated (p<.001, GG epsilon=0.695)
 # GG-corrected rmANOVA: F(2.78, 533.72)=6.76, p<.001, pes=.034
 boxplot(a ~ t, data=fits)
 anova_test(data=fits, dv=a, wid=s, within=t, effect.size="pes", type=3)
-# Linear Slope x Tempo Interaction (n.s.)
-# Sphericity violated (p =.019, GG epsilon=0.946)
-# GG-corrected rmANOVA: F(3.79, 726.91)=2.02, p=.094, pes=.010
-boxplot(b1 ~ t, data=fits)
-anova_test(data=fits, dv=b1, wid=s, within=t, effect.size="pes", type=3)
-# Quadratic Slope x Tempo Interaction (n.s.)
-# Sphericity violated (p=.003, GG epsilon=0.937)
-# GG-corrected rmANOVA: F(3.75, 719.54)=1.56, p=.186, pes=.008
-boxplot(b2 ~ t, data=fits)
-anova_test(data=fits, dv=b2, wid=s, within=t, effect.size="pes", type=3)
-
 # Pairwise comparisons for main effect of tempo
 # 3 is lower than all except 2; 5 is greater than both 2 and 3
 pairwise.t.test(fits$a, fits$t, paired=T, p.adjust.method='bonferroni', alternative='two.sided')
@@ -215,34 +215,19 @@ for (subj in unique(data$subject)) {
   }
 }
 fits <- data.frame(s, tap, a, b1, b2)
+fits <- drop_na(fits)
 fits$s <- as.factor(fits$s)
 fits$tap <- as.factor(fits$tap)
+
+# Hotellings T-squared test for Pitch x Tapping interaction (n.s.)
+# F(2, 181) = 2.16, p = .118, pes = 0.023
+T2 <- HotellingsT2(fits[fits$tap==0, c('b1', 'b2')], fits[fits$tap==2, c('b1', 'b2')], test='f')
+T2$parameter[['df1']] * T2$statistic[[1]] / (T2$parameter[['df1']] * T2$statistic[[1]] + T2$parameter[['df2']])
+
 # Intercept (Main effect of tapping) (n.s)
-# Intercept is fixed at zero within-subject due to regressing out intercept during
-# residual tempo rating calculation. NTI condition's average intercept is guaranteed
-# to be 0; TI-YT condition's intercept may not equal 0 if the participant didn't tap
-# on every trial.
+# NTI condition's average intercept is guaranteed to be approximately 0; TI-YT condition's intercept may not equal 0
+# if the participant didn't tap on every trial.
 # t(87)=-0.17, p=.869, d=0.018, M=-0.03, SD=1.48
 boxplot(a ~ tap, data=fits)
 t.test(fits$a[tap==2], mu=0, conf.level=.95, alternative="two.sided")
 mean(fits$a[tap==2], na.rm=T) / sd(fits$a[tap==2], na.rm=T)
-# Linear Slope x Tapping Interaction (n.s.)
-# t(182)=-0.24, p=.812, d=0.035, M=1.80|2.14, SD=9.01|10.00
-boxplot(b1 ~ tap, data=fits)
-t.test(fits$b1[tap==0], fits$b1[tap==2], paired=F, var.equal=T, conf.level=.95, alternative="two.sided")
-(mean(fits$b1[tap==0], na.rm=T) - mean(fits$b1[tap==2], na.rm=T)) / sd(fits$b1[tap != 1], na.rm=T)
-# Quadratic Slope x Tapping Interaction (.)
-# t(182)=-1.94, p=.054, d=0.284, M=-6.80 | -3.63, SD=11.26|10.86
-boxplot(b2 ~ tap, data=fits)
-t.test(fits$b2[tap==0], fits$b2[tap==2], paired=F, var.equal=T, conf.level=.95, alternative="two.sided")
-(mean(fits$b2[tap==0], na.rm=T) - mean(fits$b2[tap==2], na.rm=T)) / sd(fits$b2[tap != 1], na.rm=T)
-
-# Intercept Within-Subject (n.s.)
-# t(39)=0.42, p=.676, d=???, MD=0.36, SDD=???
-t.test(fits$a[tap==1], fits$a[tap==2], paired=T, var.equal=T, conf.level=.95, alternative="two.sided")
-# Linear Slope x Tapping Interaction W.S. (n.s.)
-# t(39)=0.54, p=.595, d=???, MD=1.10, SDD=???
-t.test(fits$b1[tap==1], fits$b1[tap==2], paired=T, var.equal=T, conf.level=.95, alternative="two.sided")
-# Quadratic Slope x Tapping Interaction W.S. (n.s.)
-# t(39)=-0.61, p=.545, d=???, MD=-1.77, SDD=???
-t.test(fits$b2[tap==1], fits$b2[tap==2], paired=T, var.equal=T, conf.level=.95, alternative="two.sided")
