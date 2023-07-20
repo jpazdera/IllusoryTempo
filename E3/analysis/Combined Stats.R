@@ -184,13 +184,6 @@ plot(fits$b1, fits$b2)
 cor.test(fits$b1, fits$b2)
 # Homogeneity of covariances: Not homogeneous, but should be okay due to balanced design
 box_m(fits[, c('b1', 'b2')], fits$t)
-# Homogeneity of variance: Not homogeneous, seemingly lower variance in the middle tempo condition
-fits %>%
-  gather(key='variable', value='value', b1, b2) %>%
-  group_by(variable) %>%
-  levene_test(value ~ t)
-boxplot(b1 ~ t, data=fits)
-boxplot(b2 ~ t, data=fits)
 # Wilks = 0.982, F(8, 1534) = 1.74, p = .084, pes = .009
 model <- manova(cbind(b1, b2) ~ t + Error(s / t), data=fits)
 summary(model, test='Wilks')
