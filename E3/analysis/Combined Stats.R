@@ -1,7 +1,7 @@
 library(ICSNP)  # For HotellingsT2
-library(MANOVA.RM)
 library(rstatix)  # For anova_test
-library(tidyverse)
+library(ggpubr)  # For ggqqplot
+library(tidyverse)  # For all things tidy
 options(contrasts=c("contr.sum","contr.poly"))
 setwd("~/git/IllusoryTempo/E3/analysis/")
 
@@ -52,24 +52,23 @@ print(perc_dropped)  # 5.37% dropped
 # RAW TEMPO RATINGS
 ###
 
-# Derive theoretical ground-truth regression line
-ioi_levels <- c(1000, 918, 843, 774, 710, 652, 599, 550, 504, 463, 425, 390, 358, 329, 302)
-score <- 100 * log(1100/ioi_levels) / log(1100/275)
-true_model <- lm(score ~ log(ioi_levels))
-true_slope <- true_model$coefficients[2]
-true_intercept <- true_model$coefficients[1]
-
 # Test subject fits against ground truth
 subj_avgs <- group_by(data, subject) %>%
   summarize(slope = mean(slope), intercept = mean(intercept))
+
+# F(2, 191)=3.50, p=.032, pes=0.035
+T2 <- HotellingsT2(subj_avgs[, c('slope', 'intercept')], mu=c(50, 50), na.action=drop, test='f')
+print(T2)
+T2$parameter[['df1']] * T2$statistic[[1]] / (T2$parameter[['df1']] * T2$statistic[[1]] + T2$parameter[['df2']])
+
 # Slope (n.s.)
-# t(192)=0.40, p=.693, d=0.029
-t.test(subj_avgs$slope, mu=true_slope, conf.level=.95, alternative='two.sided')
-(mean(subj_avgs$slope) - true_slope) / sd(subj_avgs$slope)
-# Intercept (n.s.)
-# t(192)=-0.31, p=.756, d=-0.022
-t.test(subj_avgs$intercept, mu=true_intercept, conf.level=.95, alternative='two.sided')
-(mean(subj_avgs$intercept) - true_intercept) / sd(subj_avgs$intercept)
+# t(192)=-0.40, p=.693, d=0.029, M=49.70, SD=10.58
+t.test(subj_avgs$slope, mu=50, conf.level=.95, alternative='two.sided')
+(mean(subj_avgs$slope) - 50) / sd(subj_avgs$slope)
+# Intercept (**)
+# t(192)=2.62, p=.009, d=0.189, M=50.59, SD=3.14
+t.test(subj_avgs$intercept, mu=50, conf.level=.95, alternative='two.sided')
+(mean(subj_avgs$intercept) - 50) / sd(subj_avgs$intercept)
 
 ###
 # LOUDNESS CONTROL
@@ -85,8 +84,8 @@ group_sems <- group_sds / sqrt(length(unique(subj_avgs$subject)))
 subj_avgs <- ungroup(subj_avgs)
 
 # Repeated measures ANOVA (n.s.)
-# Sphericity violated (p=.043; HF epsilon=.968)
-# GG-corrected rmANOVA: F(1.96, 375.63)=1.47, p=.232, pes=.008
+# Sphericity violated (p=.043; HF epsilon=.978)
+# HF-corrected rmANOVA: F(1.96, 375.63)=1.47, p=.232, pes=.008
 anova_test(data=subj_avgs, dv=residual, wid=subject, within=loudness, effect.size="pes", type=3)
 
 ###
@@ -120,32 +119,33 @@ fits$s <- as.factor(fits$s)
 # https://biotoolbox.binghamton.edu/Multivariate%20Methods/Multivariate%20Hypothesis%20Testing/pdf%20files/MHT%20010.pdf
 # F(5, 188) = 11.27, p < .001, pes = 0.231
 T2 <- HotellingsT2(fits[, c('b1', 'b2', 'b3', 'b4', 'b5')], mu=rep(0, 5), na.action=drop, test='f')
+print(T2)
 T2$parameter[['df1']] * T2$statistic[[1]] / (T2$parameter[['df1']] * T2$statistic[[1]] + T2$parameter[['df2']])
 
 # Post-hoc one sample t-tests on slopes of each order
 # Linear Slope (**)
 # t(192)=3.17, p=.002, d=0.228, M=2.39, SD=10.49
-boxplot(fits$b1)
+ggqqplot(fits$b1)
 t.test(fits$b1, mu=0, conf.level=.95, alternative="two.sided")
 mean(fits$b1) / sd(fits$b1)
 # Quadratic Slope (***)
 # t(192)=-6.87, p<.001, d=0.494, M=-5.36, SD=10.84
-boxplot(fits$b2)
+ggqqplot(fits$b2)
 t.test(fits$b2, mu=0, conf.level=.95, alternative="two.sided")
 mean(fits$b2) / sd(fits$b2)
 # Cubic Slope (n.s.)
 # t(192)=1.10, p=.275, d=0.079, M=0.82, SD=10.36
-boxplot(fits$b3)
+ggqqplot(fits$b3)
 t.test(fits$b3, mu=0, conf.level=.95, alternative="two.sided")
 mean(fits$b3) / sd(fits$b3)
 # Quartic Slope (n.s.)
 # t(192)=0.49, p=.622, d=0.036, M=0.37, SD=10.40
-boxplot(fits$b4)
+ggqqplot(fits$b4)
 t.test(fits$b4, mu=0, conf.level=.95, alternative="two.sided")
 mean(fits$b4) / sd(fits$b4)
 # Quintic Slope (n.s.)
 # t(192)=-1.62, p=.106, d=0.117, M=-1.14, SD=9.71
-boxplot(fits$b5)
+ggqqplot(fits$b5)
 t.test(fits$b5, mu=0, conf.level=.95, alternative="two.sided")
 mean(fits$b5) / sd(fits$b5)
 
@@ -174,10 +174,27 @@ fits$s <- as.factor(fits$s)
 fits$t <- as.factor(fits$t)
 
 # MANOVA for Pitch x Tempo interaction (n.s.)
-# Pillai = .018, F(8, 1536) = 1.74, p = .084, pes = .009
+# Normality: Univariate QQplots suggest higher than expected kurtosis, without much skew - probably okay for MANOVA
+# Multivariate distribution seems okay, maybe 2 or 3 notable outliers
+ggqqplot(fits, 'b1', facet.by='t')
+ggqqplot(fits, 'b2', facet.by='t')
+plot(fits$b1, fits$b2)
+# Slopes are only slightly negatively correlated, no multicollinearity
+# No apparent nonlinear relation between slopes
+cor.test(fits$b1, fits$b2)
+# Homogeneity of covariances: Not homogeneous, but should be okay due to balanced design
+box_m(fits[, c('b1', 'b2')], fits$t)
+# Homogeneity of variance: Not homogeneous, seemingly lower variance in the middle tempo condition
+fits %>%
+  gather(key='variable', value='value', b1, b2) %>%
+  group_by(variable) %>%
+  levene_test(value ~ t)
+boxplot(b1 ~ t, data=fits)
+boxplot(b2 ~ t, data=fits)
+# Wilks = 0.982, F(8, 1534) = 1.74, p = .084, pes = .009
 model <- manova(cbind(b1, b2) ~ t + Error(s / t), data=fits)
-summary(model)
-8 * 1.7424 / (8 * 1.7424 + 1536)  # Partial eta squared
+summary(model, test='Wilks')
+8 * 1.7448 / (8 * 1.7448 + 1534)  # Partial eta squared
 
 # Intercept (Main Effect of Tempo Range) (***)
 # Sphericity violated (p<.001, GG epsilon=0.695)
@@ -219,9 +236,15 @@ fits <- drop_na(fits)
 fits$s <- as.factor(fits$s)
 fits$tap <- as.factor(fits$tap)
 
+ggqqplot(fits, 'a', facet.by='tap')
+ggqqplot(fits, 'b1', facet.by='tap')
+ggqqplot(fits, 'b2', facet.by='tap')
+plot(fits$b1, fits$b2)
+
 # Hotellings T-squared test for Pitch x Tapping interaction (n.s.)
 # F(2, 181) = 2.16, p = .118, pes = 0.023
 T2 <- HotellingsT2(fits[fits$tap==0, c('b1', 'b2')], fits[fits$tap==2, c('b1', 'b2')], test='f')
+print(T2)
 T2$parameter[['df1']] * T2$statistic[[1]] / (T2$parameter[['df1']] * T2$statistic[[1]] + T2$parameter[['df2']])
 
 # Intercept (Main effect of tapping) (n.s)
