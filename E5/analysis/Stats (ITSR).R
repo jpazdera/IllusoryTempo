@@ -1,5 +1,7 @@
+library(ICSNP)  # For HotellingsT2
 library(rstatix)  # For anova_test
-library(tidyverse)
+library(ggpubr)  # For ggqqplot
+library(tidyverse)  # For all things tidy
 options(contrasts=c("contr.sum","contr.poly"))
 setwd("~/git/IllusoryTempo/E5/analysis")
 
@@ -18,7 +20,7 @@ full_data <- filter(full_data, !(subject %in% excluded))
 full_data <- mutate_if(full_data, is.character, as.factor)
 full_data$subject <- as.factor(full_data$subject)
 full_data$pitch <- as.numeric(full_data$pitch)
-full_data$tempo <- as.factor(full_data$tempo)
+full_data$tempo_range <- as.factor(full_data$tempo_range)
 full_data$loudness <- as.factor(full_data$loudness)
 full_data$range <- as.factor(full_data$range)
 str(full_data)
@@ -34,24 +36,24 @@ print(perc_dropped)  # 4.85% dropped
 # RAW TEMPO RATINGS
 ###
 
-# Derive theoretical ground-truth regression line
-ioi_levels <- c(1000, 918, 843, 774, 710, 652, 599, 550, 504, 463, 425, 390, 358, 329, 302)
-score <- 100 * log(1100/ioi_levels) / log(1100/275)
-true_model <- lm(score ~ log(ioi_levels))
-true_slope <- true_model$coefficients[2]
-true_intercept <- true_model$coefficients[1]
-
 # Test subject fits against ground truth
 subj_avgs <- group_by(data, subject) %>%
   summarize(slope = mean(slope), intercept = mean(intercept))
+
+# Overall Average Model (**)
+# F(2, 74)=6.91, p=.002, pes=0.157
+T2 <- HotellingsT2(subj_avgs[, c('slope', 'intercept')], mu=c(50, 50), na.action=drop, test='f')
+print(T2)
+T2$parameter[['df1']] * T2$statistic[[1]] / (T2$parameter[['df1']] * T2$statistic[[1]] + T2$parameter[['df2']])
+
 # Slope (n.s.)
-# t(75)=0.71, p=.479, d=0.082
-t.test(subj_avgs$slope, mu=true_slope, conf.level=.95, alternative='two.sided')
-(mean(subj_avgs$slope) - true_slope) / sd(subj_avgs$slope)
-# Intercept (n.s.)
-# t(75)=-0.57, p=.571, d=-0.065
-t.test(subj_avgs$intercept, mu=true_intercept, conf.level=.95, alternative='two.sided')
-(mean(subj_avgs$intercept) - true_intercept) / sd(subj_avgs$intercept)
+# t(75)=-0.71, p=.479, d=0.082, M=49.10, CI=[46.57, 51.62]
+t.test(subj_avgs$slope, mu=50, conf.level=.95, alternative='two.sided')
+(mean(subj_avgs$slope) - 50) / sd(subj_avgs$slope)
+# Intercept (**)
+# t(75)=3.72, p<.001, d=0.427, M=51.66, CI=[50.77, 52.55]
+t.test(subj_avgs$intercept, mu=50, conf.level=.95, alternative='two.sided')
+(mean(subj_avgs$intercept) - 50) / sd(subj_avgs$intercept)
 
 ###
 # LOUDNESS CONTROL
@@ -59,16 +61,16 @@ t.test(subj_avgs$intercept, mu=true_intercept, conf.level=.95, alternative='two.
 
 # Get subject averages
 subj_avgs <- group_by(data, subject, loudness) %>%
-  summarize(residual = mean(residual, na.rm=T))
-# Descriptive stats by condition -3:M=0.15, SD=0.12; +0:M=-0.03, SD=0.10; +3:M=-0.12, SD=0.11
-group_means <- aggregate(subj_avgs$residual, list(subj_avgs$loudness), mean)$x  # Means by condition
-group_sds <- aggregate(subj_avgs$residual, list(subj_avgs$loudness), sd)$x / sqrt(length(unique(subj_avgs$subject)))  # Standard deviations by condition
-group_sems <- group_sds / sqrt(length(unique(subj_avgs$subject)))  # Standard errors by condition
+  summarize(residual = mean(residual, na.rm=T), illusory_tempo = mean(illusory_tempo, na.rm=T))
+# Descriptive stats by condition -3:M=0.19, SD=2.07; +0:M=-0.02, SD=1.72; +3:M=-0.17, SD=4.04
+group_means <- aggregate(subj_avgs$illusory_tempo, list(subj_avgs$loudness), mean)
+group_sds <- aggregate(subj_avgs$illusory_tempo, list(subj_avgs$loudness), sd)
 subj_avgs <- ungroup(subj_avgs)
 
 # Repeated measures ANOVA (n.s.)
-# F(2, 150)=0.98, p=.377, pes=.013
-anova_test(data=subj_avgs, dv=residual, wid=subject, within=loudness, effect.size="pes", type=3)
+# Sphericity not violated (p=.174)
+# rmANOVA: F(2, 150)=0.45, p=.639, pes=.006
+anova_test(data=subj_avgs, dv=illusory_tempo, wid=subject, within=loudness, effect.size="pes", type=3)
 
 ###
 # EFFECT OF PITCH AND REGISTER
@@ -83,7 +85,7 @@ for (subj in unique(data$subject)) {
   for (reg in c(0, 1)) {
     mask <- (data$subject==subj) & (data$range == reg)
     if (sum(mask) > 2) {
-      model <- lm(residual ~ 1 + poly(pitch, 2), data=data[mask,])
+      model <- lm(illusory_tempo ~ 1 + poly(pitch, 2), data=data[mask,])
       s <- append(s, subj)
       r <- append(r, reg)
       a <- append(a, model$coefficients[1])
@@ -92,40 +94,35 @@ for (subj in unique(data$subject)) {
     }
   }
 }
-fits <- data.frame(s, r, b1, b2)
+fits <- data.frame(s, r, a, b1, b2)
 fits$s <- as.factor(fits$s)
 fits$r <- as.factor(fits$r)
+plot(fits$b1, fits$b2)
 
 # MAIN EFFECT OF PITCH
-# Intercepts are all approximately 0 due to already regressing out subject intercepts
-# during calculation of residual tempo ratings
+# Intercepts are all approximately 0 due to already regressing out subject intercepts during calculation of
+# residual tempo ratings. Compare the model slopes to 0 with Hotelling's T-squared.
+# F(2, 74) = 17.08, p < .001, pes = 0.316
+T2 <- HotellingsT2(fits[, c('b1', 'b2')], mu=rep(0, 2), na.action=drop, test='f')
+print(T2)
+T2$parameter[['df1']] * T2$statistic[[1]] / (T2$parameter[['df1']] * T2$statistic[[1]] + T2$parameter[['df2']])
+
+# Post-hoc one sample t-tests on slopes of each order
 # Linear Slope (***)
-# t(75)=6.05, p<.001, d=0.694, M=11.15, SD=16.06
-boxplot(fits$b1)
+# t(75)=5.87, p<.001, d=0.673, M=26.46, CI=[17.47, 35.45]
+ggqqplot(fits$b1)
 t.test(fits$b1, mu=0, conf.level=.95, alternative="two.sided")
 mean(fits$b1) / sd(fits$b1)
 # Quadratic Slope (n.s.)
-# t(75)=-0.950, p=.345, d=-0.109, M=-0.90, SD=8.22
-boxplot(fits$b2)
+# t(75)=-1.11, p=.270, d=0.128, M=-2.38, CI=[-6.65, 1.89]
+ggqqplot(fits$b2)
 t.test(fits$b2, mu=0, conf.level=.95, alternative="two.sided")
 mean(fits$b2) / sd(fits$b2)
 
 # PITCH x REGISTER INTERACTION
-# Linear Slope (*)
-# t(74)=2.07, p=.042, d=0.465, M=14.98|7.51, SD=16.81|14.62
-boxplot(b1 ~ r, data=fits)
-t.test(fits$b1[fits$r==0], fits$b1[fits$r==1], paired=F, var.equal=T, conf.level=.95, alternative="two.sided")
-(mean(fits$b1[fits$r==0]) - mean(fits$b1[fits$r==1])) / sd(fits$b1)
-# Quadratic Slope (n.s.)
-# t(74)=-1.71, p=.091, d=-0.389, M=-2.53|0.66, SD=9.16|6.98
-boxplot(b2 ~ r, data=fits)
-t.test(fits$b2[fits$r==0], fits$b2[fits$r==1], paired=F, var.equal=T, conf.level=.95, alternative="two.sided")
-(mean(fits$b2[fits$r==0]) - mean(fits$b2[fits$r==1])) / sd(fits$b2)
 
-# Linear slope significantly differs by condition, so check whether slopes are nonzero in each condition
-# Lower Register (***): t(36)=5.42, p<.001, d=0.891, M=14.98, SD=16.81
-# Upper Register (**): t(38)=3.21, p=.003, d=0.514, M=7.51, SD=14.62
-t.test(fits$b1[fits$r==0], mu=0, conf.level=.95, alternative="two.sided")
-mean(fits$b1[fits$r==0]) / sd(fits$b1[fits$r==0])
-t.test(fits$b1[fits$r==1], mu=0, conf.level=.95, alternative="two.sided")
-mean(fits$b1[fits$r==1]) / sd(fits$b1[fits$r==1])
+# Hotellings T-squared test for Pitch x Tapping interaction (n.s.)
+# F(2, 73)=2.62, p=.080, pes = 0.067
+T2 <- HotellingsT2(fits[fits$r==0, c('b1', 'b2')], fits[fits$r==1, c('b1', 'b2')], test='f')
+print(T2)
+T2$parameter[['df1']] * T2$statistic[[1]] / (T2$parameter[['df1']] * T2$statistic[[1]] + T2$parameter[['df2']])
