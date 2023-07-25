@@ -38,7 +38,7 @@ full_data <- rbind(data0, data1, data2)
 full_data <- mutate_if(full_data, is.character, as.factor)
 full_data$subject <- as.factor(full_data$subject)
 full_data$pitch <- as.numeric(full_data$pitch)
-full_data$tempo <- as.factor(full_data$tempo)
+full_data$tempo_range <- as.factor(full_data$tempo_range)
 full_data$loudness <- as.factor(full_data$loudness)
 
 # Filter out outlier trials
@@ -62,11 +62,11 @@ print(T2)
 T2$parameter[['df1']] * T2$statistic[[1]] / (T2$parameter[['df1']] * T2$statistic[[1]] + T2$parameter[['df2']])
 
 # Slope (n.s.)
-# t(192)=-0.40, p=.693, d=0.029, M=49.70, SD=10.58
+# t(192)=-0.40, p=.693, d=0.029, M=49.70, CI=[48.20, 51.20]
 t.test(subj_avgs$slope, mu=50, conf.level=.95, alternative='two.sided')
 (mean(subj_avgs$slope) - 50) / sd(subj_avgs$slope)
 # Intercept (**)
-# t(192)=2.62, p=.009, d=0.189, M=50.59, SD=3.14
+# t(192)=2.62, p=.009, d=0.189, M=50.59, CI=[50.15, 51.04]
 t.test(subj_avgs$intercept, mu=50, conf.level=.95, alternative='two.sided')
 (mean(subj_avgs$intercept) - 50) / sd(subj_avgs$intercept)
 
@@ -76,17 +76,16 @@ t.test(subj_avgs$intercept, mu=50, conf.level=.95, alternative='two.sided')
 
 # Get subject averages
 subj_avgs <- group_by(data, subject, loudness) %>%
-  summarize(residual = mean(residual, na.rm=T))
-# Descriptive stats by condition -3:M=0.21, SD=0.13; +0:M=-0.09, SD=0.11; +3:M=-0.11, SD=0.13
-group_means <- aggregate(subj_avgs$residual, list(subj_avgs$loudness), mean)$x
-group_sds <- aggregate(subj_avgs$residual, list(subj_avgs$loudness), sd)$x / sqrt(length(unique(subj_avgs$subject)))
-group_sems <- group_sds / sqrt(length(unique(subj_avgs$subject)))
+  summarize(residual = mean(residual, na.rm=T), illusory_tempo = mean(illusory_tempo, na.rm=T))
+# Descriptive stats by condition -3:M=0.34, SD=3.88; +0:M=-0.17, SD=3.29; +3:M=-0.17, SD=4.04
+group_means <- aggregate(subj_avgs$illusory_tempo, list(subj_avgs$loudness), mean)
+group_sds <- aggregate(subj_avgs$illusory_tempo, list(subj_avgs$loudness), sd)
 subj_avgs <- ungroup(subj_avgs)
 
 # Repeated measures ANOVA (n.s.)
-# Sphericity violated (p=.043; HF epsilon=.978)
-# HF-corrected rmANOVA: F(1.96, 375.63)=1.47, p=.232, pes=.008
-anova_test(data=subj_avgs, dv=residual, wid=subject, within=loudness, effect.size="pes", type=3)
+# Sphericity violated (p=.005; HF epsilon=.957)
+# HF-corrected rmANOVA: F(1.91, 367.66)=0.79, p=.449, pes=.004
+anova_test(data=subj_avgs, dv=illusory_tempo, wid=subject, within=loudness, effect.size="pes", type=3)
 
 ###
 # EFFECT OF PITCH
@@ -101,7 +100,7 @@ b4 <- c()
 b5 <- c()
 for (subj in unique(data$subject)) {
   mask <- (data$subject==subj)
-  model <- lm(residual ~ 1 + poly(pitch, 5), data=data[mask,])
+  model <- lm(illusory_tempo ~ 1 + poly(pitch, 5), data=data[mask,])
   s <- append(s, subj)
   a <- append(a, model$coefficients[1])
   b1 <- append(b1, model$coefficients[2])
@@ -117,34 +116,34 @@ fits$s <- as.factor(fits$s)
 # residual tempo ratings. Compare the five slopes to 0 with Hotelling's T-squared. These pages have great explanations:
 # https://real-statistics.com/multivariate-statistics/hotellings-t-square-statistic/one-sample-hotellings-t-square/
 # https://biotoolbox.binghamton.edu/Multivariate%20Methods/Multivariate%20Hypothesis%20Testing/pdf%20files/MHT%20010.pdf
-# F(5, 188) = 11.27, p < .001, pes = 0.231
+# F(5, 188) = 10.51, p < .001, pes = 0.218
 T2 <- HotellingsT2(fits[, c('b1', 'b2', 'b3', 'b4', 'b5')], mu=rep(0, 5), na.action=drop, test='f')
 print(T2)
 T2$parameter[['df1']] * T2$statistic[[1]] / (T2$parameter[['df1']] * T2$statistic[[1]] + T2$parameter[['df2']])
 
 # Post-hoc one sample t-tests on slopes of each order
-# Linear Slope (**)
-# t(192)=3.17, p=.002, d=0.228, M=2.39, SD=10.49
+# Linear Slope (*)
+# t(192)=2.40, p=.017, d=0.173, M=4.36, CI=[0.78, 7.94]
 ggqqplot(fits$b1)
 t.test(fits$b1, mu=0, conf.level=.95, alternative="two.sided")
 mean(fits$b1) / sd(fits$b1)
 # Quadratic Slope (***)
-# t(192)=-6.87, p<.001, d=0.494, M=-5.36, SD=10.84
+# t(192)=-6.70, p<.001, d=0.483, M=-11.55, CI=[-14.95  -8.15]
 ggqqplot(fits$b2)
 t.test(fits$b2, mu=0, conf.level=.95, alternative="two.sided")
 mean(fits$b2) / sd(fits$b2)
 # Cubic Slope (n.s.)
-# t(192)=1.10, p=.275, d=0.079, M=0.82, SD=10.36
+# t(192)=1.16, p=.249, d=0.083, M=1.94, CI=[-1.37, 5.24]
 ggqqplot(fits$b3)
 t.test(fits$b3, mu=0, conf.level=.95, alternative="two.sided")
 mean(fits$b3) / sd(fits$b3)
 # Quartic Slope (n.s.)
-# t(192)=0.49, p=.622, d=0.036, M=0.37, SD=10.40
+# t(192)=0.88, p=.381, d=0.063, M=1.41, CI=[-1.76, 4.58]
 ggqqplot(fits$b4)
 t.test(fits$b4, mu=0, conf.level=.95, alternative="two.sided")
 mean(fits$b4) / sd(fits$b4)
 # Quintic Slope (n.s.)
-# t(192)=-1.62, p=.106, d=0.117, M=-1.14, SD=9.71
+# t(192)=-1.62, p=.106, d=0.117, M=-1.14, CI=[-4.89  0.75]
 ggqqplot(fits$b5)
 t.test(fits$b5, mu=0, conf.level=.95, alternative="two.sided")
 mean(fits$b5) / sd(fits$b5)
@@ -159,11 +158,11 @@ a <- c()
 b1 <- c()
 b2 <- c()
 for (subj in unique(data$subject)) {
-  for (temp in c(1:5)) {
-    mask <- (data$subject==subj) & (data$tempo == temp)
-    model <- lm(residual ~ 1 + poly(pitch, 2), data=data[mask,])
+  for (tr in c(1:5)) {
+    mask <- (data$subject==subj) & (data$tempo_range == tr)
+    model <- lm(illusory_tempo ~ 1 + poly(pitch, 2), data=data[mask,])
     s <- append(s, subj)
-    t <- append(t, temp)
+    t <- append(t, tr)
     a <- append(a, model$coefficients[1])
     b1 <- append(b1, model$coefficients[2])
     b2 <- append(b2, model$coefficients[3])
@@ -179,19 +178,19 @@ fits$t <- as.factor(fits$t)
 ggqqplot(fits, 'b1', facet.by='t')
 ggqqplot(fits, 'b2', facet.by='t')
 plot(fits$b1, fits$b2)
-# Slopes are only slightly negatively correlated, no multicollinearity
+# Slopes are not significantly correlated, no multicollinearity
 # No apparent nonlinear relation between slopes
 cor.test(fits$b1, fits$b2)
 # Homogeneity of covariances: Not homogeneous, but should be okay due to balanced design
 box_m(fits[, c('b1', 'b2')], fits$t)
-# Wilks = 0.982, F(8, 1534) = 1.74, p = .084, pes = .009
+# Wilks = 0.983, F(8, 1534) = 1.65, p = .107, pes = .009
 model <- manova(cbind(b1, b2) ~ t + Error(s / t), data=fits)
 summary(model, test='Wilks')
-8 * 1.7448 / (8 * 1.7448 + 1534)  # Partial eta squared
+8 * 1.6465 / (8 * 1.6465 + 1534)  # Partial eta squared
 
 # Intercept (Main Effect of Tempo Range) (***)
-# Sphericity violated (p<.001, GG epsilon=0.695)
-# GG-corrected rmANOVA: F(2.78, 533.72)=6.76, p<.001, pes=.034
+# Sphericity violated (p<.001, GG epsilon=0.715)
+# GG-corrected rmANOVA: F(2.86, 549.02)=5.55, p<.001, pes=.028
 boxplot(a ~ t, data=fits)
 anova_test(data=fits, dv=a, wid=s, within=t, effect.size="pes", type=3)
 # Pairwise comparisons for main effect of tempo
@@ -213,7 +212,7 @@ for (subj in unique(data$subject)) {
     s <- append(s, subj)
     tap <- append(tap, tap_cond)
     if (sum(mask) > 2) {
-      model <- lm(residual ~ 1 + poly(pitch, 2), data=data[mask,])
+      model <- lm(illusory_tempo ~ 1 + poly(pitch, 2), data=data[mask,])
       a <- append(a, model$coefficients[1])
       b1 <- append(b1, model$coefficients[2])
       b2 <- append(b2, model$coefficients[3])
@@ -234,16 +233,28 @@ ggqqplot(fits, 'b1', facet.by='tap')
 ggqqplot(fits, 'b2', facet.by='tap')
 plot(fits$b1, fits$b2)
 
-# Hotellings T-squared test for Pitch x Tapping interaction (n.s.)
-# F(2, 181) = 2.16, p = .118, pes = 0.023
+# Hotellings T-squared test for Pitch x Tapping interaction (*)
+# F(2, 181) = 3.28, p = .040, pes = 0.035
 T2 <- HotellingsT2(fits[fits$tap==0, c('b1', 'b2')], fits[fits$tap==2, c('b1', 'b2')], test='f')
 print(T2)
 T2$parameter[['df1']] * T2$statistic[[1]] / (T2$parameter[['df1']] * T2$statistic[[1]] + T2$parameter[['df2']])
 
+# Post-hoc t-test for effect of tapping on each slope order
+# Linear Slope (n.s.)
+# t(182)=-0.64, p=.526, d=0.089, M=2.83 | 4.98, CIdiff=[-8.82, 4.52]
+boxplot(b1 ~ tap, data=fits)
+t.test(fits$b1[fits$tap==0], fits$b1[fits$tap==2], paired=F, var.equal=T, conf.level=.95, alternative="two.sided")
+(mean(fits$b1[fits$tap==0]) - mean(fits$b1[fits$tap==2])) / sd(fits$b1)
+# Quadratic Slope (*)
+# t(182)=-2.29, p=.023, d=0.330, diff=2.27, M=-15.21 | -6.90, CIdiff=[-15.49, -1.14]
+boxplot(b2 ~ tap, data=fits)
+t.test(fits$b2[fits$tap==0], fits$b2[fits$tap==2], paired=F, var.equal=T, conf.level=.95, alternative="two.sided")
+(mean(fits$b2[fits$tap==0]) - mean(fits$b2[fits$tap==2])) / sd(fits$b2)
+
 # Intercept (Main effect of tapping) (n.s)
 # NTI condition's average intercept is guaranteed to be approximately 0; TI-YT condition's intercept may not equal 0
 # if the participant didn't tap on every trial.
-# t(87)=-0.17, p=.869, d=0.018, M=-0.03, SD=1.48
+# t(76)=-0.59, p=.556, d=0.067, M=-0.30, CI=[-1.29, 0.70]
 boxplot(a ~ tap, data=fits)
 t.test(fits$a[tap==2], mu=0, conf.level=.95, alternative="two.sided")
 mean(fits$a[tap==2], na.rm=T) / sd(fits$a[tap==2], na.rm=T)
