@@ -91,6 +91,7 @@ anova_test(data=subj_avgs, dv=illusory_tempo, wid=subject, within=loudness, effe
 # EFFECT OF PITCH
 ###
 
+example_subj <- 1015
 s <- c()
 a <- c()
 b1 <- c()
@@ -101,6 +102,9 @@ b5 <- c()
 for (subj in unique(data$subject)) {
   mask <- (data$subject==subj)
   model <- lm(illusory_tempo ~ 1 + poly(pitch, 5), data=data[mask,])
+  if (subj == example_subj) {
+    write.csv(predict(model, newdata=data.frame(pitch=seq(2, 7, by=.1)), row.names=F), 'example_fit_prediction.csv')
+  }
   s <- append(s, subj)
   a <- append(a, model$coefficients[1])
   b1 <- append(b1, model$coefficients[2])
@@ -153,7 +157,6 @@ mean(fits$b5) / sd(fits$b5)
 # EFFECT OF TEMPO RANGE
 ###
 
-example_subj <- 1015
 s <- c()
 t <- c()
 a <- c()
@@ -163,9 +166,6 @@ for (subj in unique(data$subject)) {
   for (tr in c(1:5)) {
     mask <- (data$subject==subj) & (data$tempo_range == tr)
     model <- lm(illusory_tempo ~ 1 + poly(pitch, 2), data=data[mask,])
-    if (subj == example_subj) {
-      write.csv(predict(model, newdata=data.frame(pitch=seq(2, 7, by=.1))), 'example_fit_prediction.csv')
-    }
     s <- append(s, subj)
     t <- append(t, tr)
     a <- append(a, model$coefficients[1])
