@@ -111,6 +111,7 @@ for (subj in unique(data$subject)) {
 }
 fits <- data.frame(s, a, b1, b2, b3, b4, b5)
 fits$s <- as.factor(fits$s)
+write.csv(fits, 'pitch_fits.csv', row.names=F)
 
 # Intercepts are all approximately 0 due to already regressing out subject intercepts during calculation of
 # residual tempo ratings. Compare the five slopes to 0 with Hotelling's T-squared. These pages have great explanations:
@@ -227,6 +228,7 @@ fits <- data.frame(s, tap, a, b1, b2)
 fits <- drop_na(fits)
 fits$s <- as.factor(fits$s)
 fits$tap <- as.factor(fits$tap)
+write.csv(fits, 'tap_fits.csv', row.names=F)
 
 ggqqplot(fits, 'a', facet.by='tap')
 ggqqplot(fits, 'b1', facet.by='tap')
