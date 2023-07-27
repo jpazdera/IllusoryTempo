@@ -153,6 +153,7 @@ mean(fits$b5) / sd(fits$b5)
 # EFFECT OF TEMPO RANGE
 ###
 
+example_subj <- 1015
 s <- c()
 t <- c()
 a <- c()
@@ -162,6 +163,9 @@ for (subj in unique(data$subject)) {
   for (tr in c(1:5)) {
     mask <- (data$subject==subj) & (data$tempo_range == tr)
     model <- lm(illusory_tempo ~ 1 + poly(pitch, 2), data=data[mask,])
+    if (subj == example_subj) {
+      write.csv(predict(model, newdata=data.frame(pitch=seq(2, 7, by=.1))), 'example_fit_prediction.csv')
+    }
     s <- append(s, subj)
     t <- append(t, tr)
     a <- append(a, model$coefficients[1])
