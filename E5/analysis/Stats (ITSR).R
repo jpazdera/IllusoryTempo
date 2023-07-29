@@ -123,7 +123,7 @@ mean(fits$b2) / sd(fits$b2)
 
 # PITCH x REGISTER INTERACTION
 
-# Hotellings T-squared test for Pitch x Tapping interaction (n.s.)
+# Hotellings T-squared test for Pitch x Register interaction (n.s.)
 # F(2, 73)=2.62, p=.080, pes = 0.067
 T2 <- HotellingsT2(fits[fits$r==0, c('b1', 'b2')], fits[fits$r==1, c('b1', 'b2')], test='f')
 print(T2)
