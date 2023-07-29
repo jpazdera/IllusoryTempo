@@ -61,12 +61,13 @@ T2 <- HotellingsT2(subj_avgs[, c('slope', 'intercept')], mu=c(50, 50), na.action
 print(T2)
 T2$parameter[['df1']] * T2$statistic[[1]] / (T2$parameter[['df1']] * T2$statistic[[1]] + T2$parameter[['df2']])
 
+# Post-hoc univariate t-tests - note that all post-hoc testing is Holm-Bonferroni corrected to determine significance
 # Slope (n.s.)
-# t(192)=-0.40, p=.693, d=0.029, M=49.70, CI=[48.20, 51.20]
+# t(192)=-0.40, p=.693 (.693), d=0.029, M=49.70, CI=[48.20, 51.20]
 t.test(subj_avgs$slope, mu=50, conf.level=.95, alternative='two.sided')
 (mean(subj_avgs$slope) - 50) / sd(subj_avgs$slope)
-# Intercept (**)
-# t(192)=2.62, p=.009, d=0.189, M=50.59, CI=[50.15, 51.04]
+# Intercept (*)
+# t(192)=2.62, p=.009 (.019), d=0.189, M=50.59, CI=[50.15, 51.04]
 t.test(subj_avgs$intercept, mu=50, conf.level=.95, alternative='two.sided')
 (mean(subj_avgs$intercept) - 50) / sd(subj_avgs$intercept)
 
@@ -103,7 +104,7 @@ for (subj in unique(data$subject)) {
   mask <- (data$subject==subj)
   model <- lm(illusory_tempo ~ 1 + poly(pitch, 5), data=data[mask,])
   if (subj == example_subj) {
-    write.csv(predict(model, newdata=data.frame(pitch=seq(2, 7, by=.1)), row.names=F), 'example_fit_prediction.csv')
+    write.csv(predict(model, newdata=data.frame(pitch=seq(2, 7, by=.1)), row.names=F), '../data/example_fit_prediction.csv')
   }
   s <- append(s, subj)
   a <- append(a, model$coefficients[1])
@@ -115,7 +116,7 @@ for (subj in unique(data$subject)) {
 }
 fits <- data.frame(s, a, b1, b2, b3, b4, b5)
 fits$s <- as.factor(fits$s)
-write.csv(fits, 'pitch_fits.csv', row.names=F)
+write.csv(fits, '../data/pitch_fits.csv', row.names=F)
 
 # Intercepts are all approximately 0 due to already regressing out subject intercepts during calculation of
 # residual tempo ratings. Compare the five slopes to 0 with Hotelling's T-squared. These pages have great explanations:
@@ -127,13 +128,13 @@ print(T2)
 T2$parameter[['df1']] * T2$statistic[[1]] / (T2$parameter[['df1']] * T2$statistic[[1]] + T2$parameter[['df2']])
 
 # Post-hoc one sample t-tests on slopes of each order
-# Linear Slope (*)
-# t(192)=2.40, p=.017, d=0.173, M=4.36, CI=[0.78, 7.94]
+# Linear Slope (.)
+# t(192)=2.40, p=.017 (.069), d=0.173, M=4.36, CI=[0.78, 7.94]
 ggqqplot(fits$b1)
 t.test(fits$b1, mu=0, conf.level=.95, alternative="two.sided")
 mean(fits$b1) / sd(fits$b1)
 # Quadratic Slope (***)
-# t(192)=-6.70, p<.001, d=0.483, M=-11.55, CI=[-14.95  -8.15]
+# t(192)=-6.70, p<.001 (<.001), d=0.483, M=-11.55, CI=[-14.95  -8.15]
 ggqqplot(fits$b2)
 t.test(fits$b2, mu=0, conf.level=.95, alternative="two.sided")
 mean(fits$b2) / sd(fits$b2)
@@ -148,7 +149,7 @@ ggqqplot(fits$b4)
 t.test(fits$b4, mu=0, conf.level=.95, alternative="two.sided")
 mean(fits$b4) / sd(fits$b4)
 # Quintic Slope (n.s.)
-# t(192)=-1.62, p=.106, d=0.117, M=-1.14, CI=[-4.89  0.75]
+# t(192)=-1.45, p=.149, d=0.104, M=-1.14, CI=[-4.89  0.75]
 ggqqplot(fits$b5)
 t.test(fits$b5, mu=0, conf.level=.95, alternative="two.sided")
 mean(fits$b5) / sd(fits$b5)
@@ -193,14 +194,14 @@ model <- manova(cbind(b1, b2) ~ t + Error(s / t), data=fits)
 summary(model, test='Wilks')
 8 * 1.6465 / (8 * 1.6465 + 1534)  # Partial eta squared
 
-# Intercept (Main Effect of Tempo Range) (***)
+# Intercept (Main Effect of Tempo Range) (***) (Not discussed in the paper for conciseness)
 # Sphericity violated (p<.001, GG epsilon=0.715)
 # GG-corrected rmANOVA: F(2.86, 549.02)=5.55, p<.001, pes=.028
 boxplot(a ~ t, data=fits)
 anova_test(data=fits, dv=a, wid=s, within=t, effect.size="pes", type=3)
 # Pairwise comparisons for main effect of tempo
 # 3 is lower than all except 2; 5 is greater than both 2 and 3
-pairwise.t.test(fits$a, fits$t, paired=T, p.adjust.method='bonferroni', alternative='two.sided')
+pairwise.t.test(fits$a, fits$t, paired=T, p.adjust.method='holm', alternative='two.sided')
 
 ###
 # EFFECT OF TAPPING
@@ -232,7 +233,7 @@ fits <- data.frame(s, tap, a, b1, b2)
 fits <- drop_na(fits)
 fits$s <- as.factor(fits$s)
 fits$tap <- as.factor(fits$tap)
-write.csv(fits, 'tap_fits.csv', row.names=F)
+write.csv(fits, '../data/tap_fits.csv', row.names=F)
 
 ggqqplot(fits, 'a', facet.by='tap')
 ggqqplot(fits, 'b1', facet.by='tap')
@@ -247,20 +248,12 @@ T2$parameter[['df1']] * T2$statistic[[1]] / (T2$parameter[['df1']] * T2$statisti
 
 # Post-hoc t-test for effect of tapping on each slope order
 # Linear Slope (n.s.)
-# t(182)=-0.64, p=.526, d=0.089, M=2.83 | 4.98, CIdiff=[-8.82, 4.52]
+# t(182)=-0.64, p=.526 (.526), d=0.089, M=2.83 | 4.98, CIdiff=[-8.82, 4.52]
 boxplot(b1 ~ tap, data=fits)
 t.test(fits$b1[fits$tap==0], fits$b1[fits$tap==2], paired=F, var.equal=T, conf.level=.95, alternative="two.sided")
 (mean(fits$b1[fits$tap==0]) - mean(fits$b1[fits$tap==2])) / sd(fits$b1)
 # Quadratic Slope (*)
-# t(182)=-2.29, p=.023, d=0.330, diff=2.27, M=-15.21 | -6.90, CIdiff=[-15.49, -1.14]
+# t(182)=-2.29, p=.023 (.047), d=0.330, diff=2.27, M=-15.21 | -6.90, CIdiff=[-15.49, -1.14]
 boxplot(b2 ~ tap, data=fits)
 t.test(fits$b2[fits$tap==0], fits$b2[fits$tap==2], paired=F, var.equal=T, conf.level=.95, alternative="two.sided")
 (mean(fits$b2[fits$tap==0]) - mean(fits$b2[fits$tap==2])) / sd(fits$b2)
-
-# Intercept (Main effect of tapping) (n.s)
-# NTI condition's average intercept is guaranteed to be approximately 0; TI-YT condition's intercept may not equal 0
-# if the participant didn't tap on every trial.
-# t(76)=-0.59, p=.556, d=0.067, M=-0.30, CI=[-1.29, 0.70]
-boxplot(a ~ tap, data=fits)
-t.test(fits$a[tap==2], mu=0, conf.level=.95, alternative="two.sided")
-mean(fits$a[tap==2], na.rm=T) / sd(fits$a[tap==2], na.rm=T)

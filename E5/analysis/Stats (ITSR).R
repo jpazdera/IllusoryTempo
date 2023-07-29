@@ -46,12 +46,13 @@ T2 <- HotellingsT2(subj_avgs[, c('slope', 'intercept')], mu=c(50, 50), na.action
 print(T2)
 T2$parameter[['df1']] * T2$statistic[[1]] / (T2$parameter[['df1']] * T2$statistic[[1]] + T2$parameter[['df2']])
 
+# Post-hoc univariate t-testing - note that all post-hoc testing is Holm-Bonferroni corrected to determine significance
 # Slope (n.s.)
-# t(75)=-0.71, p=.479, d=0.082, M=49.10, CI=[46.57, 51.62]
+# t(75)=-0.71, p=.479 (.479), d=0.082, M=49.10, CI=[46.57, 51.62]
 t.test(subj_avgs$slope, mu=50, conf.level=.95, alternative='two.sided')
 (mean(subj_avgs$slope) - 50) / sd(subj_avgs$slope)
-# Intercept (**)
-# t(75)=3.72, p<.001, d=0.427, M=51.66, CI=[50.77, 52.55]
+# Intercept (***)
+# t(75)=3.72, p<.001 (<.001), d=0.427, M=51.66, CI=[50.77, 52.55]
 t.test(subj_avgs$intercept, mu=50, conf.level=.95, alternative='two.sided')
 (mean(subj_avgs$intercept) - 50) / sd(subj_avgs$intercept)
 
@@ -98,6 +99,7 @@ fits <- data.frame(s, r, a, b1, b2)
 fits$s <- as.factor(fits$s)
 fits$r <- as.factor(fits$r)
 plot(fits$b1, fits$b2)
+write.csv(fits, '../data/pitch_fits.csv', row.names=F)
 
 # MAIN EFFECT OF PITCH
 # Intercepts are all approximately 0 due to already regressing out subject intercepts during calculation of
@@ -109,12 +111,12 @@ T2$parameter[['df1']] * T2$statistic[[1]] / (T2$parameter[['df1']] * T2$statisti
 
 # Post-hoc one sample t-tests on slopes of each order
 # Linear Slope (***)
-# t(75)=5.87, p<.001, d=0.673, M=26.46, CI=[17.47, 35.45]
+# t(75)=5.87, p<.001 (<.001), d=0.673, M=26.46, CI=[17.47, 35.45]
 ggqqplot(fits$b1)
 t.test(fits$b1, mu=0, conf.level=.95, alternative="two.sided")
 mean(fits$b1) / sd(fits$b1)
 # Quadratic Slope (n.s.)
-# t(75)=-1.11, p=.270, d=0.128, M=-2.38, CI=[-6.65, 1.89]
+# t(75)=-1.11, p=.270 (.270), d=0.128, M=-2.38, CI=[-6.65, 1.89]
 ggqqplot(fits$b2)
 t.test(fits$b2, mu=0, conf.level=.95, alternative="two.sided")
 mean(fits$b2) / sd(fits$b2)
