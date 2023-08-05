@@ -37,7 +37,7 @@ print(perc_dropped)  # 4.85% dropped
 ###
 
 # Test subject fits against ground truth
-subj_avgs <- group_by(data, subject) %>%
+subj_avgs <- data %>% group_by(range, subject) %>%
   summarize(slope = mean(slope), intercept = mean(intercept))
 
 # Overall Average Model (**)
@@ -55,6 +55,14 @@ t.test(subj_avgs$slope, mu=50, conf.level=.95, alternative='two.sided')
 # t(75)=3.72, p<.001 (<.001), d=0.427, M=51.66, CI=[50.77, 52.55]
 t.test(subj_avgs$intercept, mu=50, conf.level=.95, alternative='two.sided')
 (mean(subj_avgs$intercept) - 50) / sd(subj_avgs$intercept)
+
+# Compare raw ratings of participants in each register (n.s.)
+# F(2, 73)=0.84, p=.4341, pes=.023
+group_means_intercept <- aggregate(subj_avgs$intercept, list(subj_avgs$range), mean)
+group_means_slope <- aggregate(subj_avgs$slope, list(subj_avgs$range), mean)
+T2 <- HotellingsT2(subj_avgs[subj_avgs$range==0, c('intercept', 'slope')], subj_avgs[subj_avgs$range==1, c('intercept', 'slope')], test='f')
+print(T2)
+T2$parameter[['df1']] * T2$statistic[[1]] / (T2$parameter[['df1']] * T2$statistic[[1]] + T2$parameter[['df2']])
 
 ###
 # LOUDNESS CONTROL
