@@ -56,13 +56,11 @@ t.test(subj_avgs$slope, mu=50, conf.level=.95, alternative='two.sided')
 t.test(subj_avgs$intercept, mu=50, conf.level=.95, alternative='two.sided')
 (mean(subj_avgs$intercept) - 50) / sd(subj_avgs$intercept)
 
-# Compare raw ratings of participants in each register (n.s.)
-# F(2, 73)=0.84, p=.4341, pes=.023
+# Compare intercepts of participants in each register (n.s.)
+# t(74)=-1.15, p=.253, d=.264
 group_means_intercept <- aggregate(subj_avgs$intercept, list(subj_avgs$range), mean)
-group_means_slope <- aggregate(subj_avgs$slope, list(subj_avgs$range), mean)
-T2 <- HotellingsT2(subj_avgs[subj_avgs$range==0, c('intercept', 'slope')], subj_avgs[subj_avgs$range==1, c('intercept', 'slope')], test='f')
-print(T2)
-T2$parameter[['df1']] * T2$statistic[[1]] / (T2$parameter[['df1']] * T2$statistic[[1]] + T2$parameter[['df2']])
+t.test(subj_avgs$intercept[subj_avgs$range==0], subj_avgs$intercept[subj_avgs$range==1], conf.level=.95, alternative='two.sided', var.equal=T)
+(mean(subj_avgs$intercept[subj_avgs$range==0]) - mean(subj_avgs$intercept[subj_avgs$range==1])) / sd(subj_avgs$intercept)
 
 ###
 # LOUDNESS CONTROL
