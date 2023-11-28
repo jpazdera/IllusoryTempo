@@ -127,6 +127,43 @@ ggqqplot(fits$b2)
 t.test(fits$b2, mu=0, conf.level=.95, alternative="two.sided")
 mean(fits$b2) / sd(fits$b2)
 
+# Alternatively, test effect of pitch separately by register because different pitches are used in each register
+# Intercepts are all approximately 0 due to already regressing out subject intercepts during calculation of
+# residual tempo ratings. Compare the model slopes to 0 with Hotelling's T-squared.
+# F(2, 35) = 13.41, p < .001, pes = 0.434
+T2 <- HotellingsT2(fits[fits$r==0, c('b1', 'b2')], mu=rep(0, 2), na.action=drop, test='f')
+print(T2)
+T2$parameter[['df1']] * T2$statistic[[1]] / (T2$parameter[['df1']] * T2$statistic[[1]] + T2$parameter[['df2']])
+
+# Post-hoc one sample t-tests on slopes of each order
+# Linear Slope (***)
+# t(36)=5.21, p<.001 (<.001), d=0.856, M=33.69, CI=[20.57, 46.80]
+ggqqplot(fits[fits$r==0, 'b1'])
+t.test(fits[fits$r==0, 'b1'], mu=0, conf.level=.95, alternative="two.sided")
+mean(fits[fits$r==0, 'b1']) / sd(fits[fits$r==0, 'b1'])
+# Quadratic Slope (n.s.)
+# t(36)=-1.91, p=.064 (.064), d=0.315, M=-6.71, CI=[-13.82, 0.40]
+ggqqplot(fits[fits$r==0, 'b2'])
+t.test(fits[fits$r==0, 'b2'], mu=0, conf.level=.95, alternative="two.sided")
+mean(fits[fits$r==0, 'b2']) / sd(fits[fits$r==0, 'b2'])
+
+# F(2, 37) = 4.99, p = .012, pes = 0.212
+T2 <- HotellingsT2(fits[fits$r==1, c('b1', 'b2')], mu=rep(0, 2), na.action=drop, test='f')
+print(T2)
+T2$parameter[['df1']] * T2$statistic[[1]] / (T2$parameter[['df1']] * T2$statistic[[1]] + T2$parameter[['df2']])
+
+# Post-hoc one sample t-tests on slopes of each order
+# Linear Slope (**)
+# t(38)=3.17, p=.003 (.006), d=0.508, M=19.61, CI=[7.10, 32.12]
+ggqqplot(fits[fits$r==1, 'b1'])
+t.test(fits[fits$r==1, 'b1'], mu=0, conf.level=.95, alternative="two.sided")
+mean(fits[fits$r==1, 'b1']) / sd(fits[fits$r==1, 'b1'])
+# Quadratic Slope (n.s.)
+# t(38)=0.72, p=.477 (.477), d=0.115, M=1.72, CI=[-3.13, 6.56]
+ggqqplot(fits[fits$r==1, 'b2'])
+t.test(fits[fits$r==1, 'b2'], mu=0, conf.level=.95, alternative="two.sided")
+mean(fits[fits$r==1, 'b2']) / sd(fits[fits$r==1, 'b2'])
+
 # PITCH x REGISTER INTERACTION
 
 # Hotellings T-squared test for Pitch x Register interaction (n.s.)
