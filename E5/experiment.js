@@ -12,7 +12,7 @@ var subjectID;
      subjectID = Math.floor(Math.random() * (maxID - minID + 1)) + minID;
  }
 
-// The order of the tone types is randomized for each participant, and the type alternates between blocks
+// The register of the tones are randomized for each participant
 var octave_range = jsPsych.randomization.sampleWithoutReplacement([0, 1], 1)[0];
 
 jsPsych.data.addProperties({
