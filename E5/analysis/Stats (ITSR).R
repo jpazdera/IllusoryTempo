@@ -108,28 +108,10 @@ plot(fits$b1, fits$b2)
 write.csv(fits, '../data/pitch_fits.csv', row.names=F)
 
 # MAIN EFFECT OF PITCH
-# Intercepts are all approximately 0 due to already regressing out subject intercepts during calculation of
-# residual tempo ratings. Compare the model slopes to 0 with Hotelling's T-squared.
-# F(2, 74) = 17.08, p < .001, pes = 0.316
-T2 <- HotellingsT2(fits[, c('b1', 'b2')], mu=rep(0, 2), na.action=drop, test='f')
-print(T2)
-T2$parameter[['df1']] * T2$statistic[[1]] / (T2$parameter[['df1']] * T2$statistic[[1]] + T2$parameter[['df2']])
-
-# Post-hoc one sample t-tests on slopes of each order
-# Linear Slope (***)
-# t(75)=5.87, p<.001 (<.001), d=0.673, M=26.46, CI=[17.47, 35.45]
-ggqqplot(fits$b1)
-t.test(fits$b1, mu=0, conf.level=.95, alternative="two.sided")
-mean(fits$b1) / sd(fits$b1)
-# Quadratic Slope (n.s.)
-# t(75)=-1.11, p=.270 (.270), d=0.128, M=-2.38, CI=[-6.65, 1.89]
-ggqqplot(fits$b2)
-t.test(fits$b2, mu=0, conf.level=.95, alternative="two.sided")
-mean(fits$b2) / sd(fits$b2)
-
-# Alternatively, test effect of pitch separately by register because different pitches are used in each register
-# Intercepts are all approximately 0 due to already regressing out subject intercepts during calculation of
-# residual tempo ratings. Compare the model slopes to 0 with Hotelling's T-squared.
+# Compare the model slopes from each register to 0 with Hotelling's T-squared. Unlike for E4, we will not pool the two
+# conditions, because the models are fit across different pitches in each register. Intercepts are all approximately 0
+# due to already regressing out subject intercepts during calculation of residual tempo ratings.
+# First, test the effect of pitch in the lower register against zero:
 # F(2, 35) = 13.41, p < .001, pes = 0.434
 T2 <- HotellingsT2(fits[fits$r==0, c('b1', 'b2')], mu=rep(0, 2), na.action=drop, test='f')
 print(T2)
@@ -147,6 +129,7 @@ ggqqplot(fits[fits$r==0, 'b2'])
 t.test(fits[fits$r==0, 'b2'], mu=0, conf.level=.95, alternative="two.sided")
 mean(fits[fits$r==0, 'b2']) / sd(fits[fits$r==0, 'b2'])
 
+# Next, test the effect of pitch in the upper register against zero:
 # F(2, 37) = 4.99, p = .012, pes = 0.212
 T2 <- HotellingsT2(fits[fits$r==1, c('b1', 'b2')], mu=rep(0, 2), na.action=drop, test='f')
 print(T2)
