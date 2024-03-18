@@ -1,5 +1,5 @@
 # IllusoryTempo
-Data and code for Pazdera &amp; Trainor (2022). Full documentation coming soon!
+Data and code for Pazdera &amp; Trainor (2024). Full documentation coming soon!
 
 Shield: [![CC BY 4.0][cc-by-shield]][cc-by]
 
