@@ -1,4 +1,4 @@
-# Experiment 2 Contents
+# Experiment 2 Contents (Illusory Tempo 2)
 
 - analysis/:
     - Processing (IT2).ipynb: Python code for preprocessing the data and organizing all sessions into a response_data.csv and tap_data.csv file.
@@ -32,12 +32,27 @@
 - trial_index: Event number.
 - time_elapsed: Milliseconds elapsed since the experiment began.
 - internal_node_id: jsPsych's internal event IDs.
-- code_version: 
-- event:
+- code_version: The version of the experiment that was run (always 1.1, because Experiment 2 was originally considered version 1.1 of Experiment 1).
+- event: The type of event the row contains data for (more detailed than trial_type). Can be one of the following:
+  - welcome: Welcome screen.
+  - requirements: Screen explaining study requirements (headphones, quiet space, etc.).
+  - headphone_test_instructions: Instructions for the headphone test.
+  - headphone_test_tones: Stimulus presentation for the headphone test.
+  - headphone_test_response: Participant response for the headphone test.
+  - tap_task_instructions: The instructions for the spontaneous motor tempo measurement.
+  - tapping_test: The spontaneous motor tempo measurement.
+  - main_instructions: The instructions for the main tempo rating task.
+  - metronome: Presentation of the standard reference metronome.
+  - practice_tones: Presentation of the repeating tone on a practice trial.
+  - tones: Presentation of the repeating tone.
+  - response: The participant's tempo rating response for a trial.
+  - summary_instructions: The post-practice instructions re-summarizing the task.
+  - break: A self-paced break between blocks of trials.
+  - ending: The ending screen thanking the participant.
 
 ### Condition Data
 - subject: The ID number of the participant.
-- tap_condition:
+- tap_condition: Whether the participant was instructed to tap in time with the stimuli (true/false).
 - stimulus: The text displayed on the screen or the audio file played during that event.
 
 ### Response Data
@@ -50,7 +65,7 @@
 ## Codebook for processed data (response_data.csv)
 (Each row represents one trial.)
 ### Metadata
-- experiment: Experiment name (always IT1).
+- experiment: Experiment name (always IT2).
 - block: Block number (0-2).
 - trial: Trial number (1-90).
 
@@ -60,7 +75,7 @@
 - ioi: The inter-onset interval of the repeating tone (in ms).
 - tempo: The tempo of the repeating tone (in beats per minute).
 - tempo_range: The tempo range the repeating tone's tempo fell within, from 1 (Slow) to 5 (Fast).
-- loudness: The loudness of the repeating tone (in LKFS).
+- loudness: The loudness of the repeating tone (0=Soft, 1=Normal, 2=Loud).
 - tap_condition: Whether the participant was instructed to tap (True/False).
 - tapped: Whether the participant tapped during stimulus presentation (True/False).
 - tap_type: 0 if instructed not to tap, 1 if instructed to tap but did not, 2 if instructed to tap and did tap.
@@ -94,7 +109,8 @@
 - trial_index: The event number of the SMT trial (always the 17th event).
 - time_elapsed: Milliseconds elapsed since the experiment began.
 - internal_node_id: jsPsych's internal event IDs.
-- experiment: Experiment name (always IT1).
+- experiment: Experiment name (always IT2).
+- code_version: The version of the experiment that was run (always 1.1, because Experiment 2 was originally considered version 1.1 of Experiment 1).
 
 ### Condition Data
 - subject: The ID number of the participant.

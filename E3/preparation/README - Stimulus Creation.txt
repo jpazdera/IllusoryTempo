@@ -8,7 +8,7 @@ used in the study, and then saves them to a WAV file
 (../stimuli/tones/raw_tones.wav).
 
 2) Use Audacity to double-check the tuning of each tone. If the pitch of any
-tone is noiceably flat/sharp (this seems to be particularly prevalent in the
+tone is noticeably flat/sharp (this seems to be particularly prevalent in the
 7th octave) or Audacity detects the pitch as being different from what was
 intended, you can use the Change Pitch function to correct the tuning.
 

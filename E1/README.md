@@ -1,4 +1,4 @@
-# Experiment 1 Contents
+# Experiment 1 Contents (Illusory Tempo 1)
 
 - analysis/:
   - figures/: Contains vectorized SVG file for Figure 1.
