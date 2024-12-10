@@ -1,9 +1,11 @@
 # IllusoryTempo
 This repository contains all stimuli, code, and data for:
 
-Pazdera, J. K., & Trainor, L. J. (2024). Pitch-induced illusory percepts of time. _PsyArXiv_. doi: 10.31234/osf.io/6fx87
+Pazdera, J. K., & Trainor, L. J. (2024). Pitch-induced illusory percepts of time. _Attention, Perception, & Psychophysics_. doi: 10.3758/s13414-024-02982-8
 
-An open-access preprint of this manuscript is available at: <https://psyarxiv.com/6fx87/>
+The open-access published manuscript can be found at: <https://doi.org/10.3758/s13414-024-02982-8>
+
+A preprint of this manuscript is also available at: <https://psyarxiv.com/6fx87/>
 
 All supplemental materials are available on the Open Science Framework at <https://osf.io/85cyx/>
 
